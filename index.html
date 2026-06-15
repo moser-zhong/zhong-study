@@ -15,7 +15,7 @@
             background-color: #f0f9ff;
             background-image: radial-gradient(#bae6fd 1px, transparent 1px);
             background-size: 20px 20px;
-            touch-action: manipulation; /* 优化手机点击响应 */
+            touch-action: manipulation;
         }
 
         .card-hover {
@@ -27,7 +27,7 @@
 
         .option-btn {
             transition: all 0.2s;
-            min-height: 56px; /* 适合手指点击的高度 */
+            min-height: 56px;
         }
         .option-btn:active:not(:disabled) {
             transform: scale(0.98);
@@ -64,11 +64,29 @@
             background: #cbd5e1; 
             border-radius: 4px;
         }
+
+        .game-iframe-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #f8fafc;
+        }
+        .game-timer-overlay {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 10;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-slate-700">
     <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-100 relative flex flex-col" style="min-height: 80vh;">
-        <!-- 头部导航 -->
         <header class="bg-blue-500 p-4 sm:p-6 text-white flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-white/20 p-2 rounded-lg">
@@ -84,15 +102,13 @@
             </button>
         </header>
 
-        <!-- 主内容区域 -->
         <main class="p-4 sm:p-6 flex-grow flex flex-col justify-center overflow-y-auto custom-scrollbar">
-            
-            <!-- 1. 开始画面 -->
+            <!-- 开始界面 -->
             <div id="start-screen" class="text-center space-y-6 animate-bounce-in w-full">
                 <div class="mb-6">
                     <img src="https://picsum.photos/seed/englishkids/400/200" alt="孩子們快樂學習英文的插圖" class="rounded-2xl shadow-md mx-auto mb-4 w-full max-w-md object-cover h-40 sm:h-48">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-600 mb-2">準備好挑戰了嗎？</h2>
-                    <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習</p>
+                    <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習<br/><strong class="text-purple-500">完成50題滿分可解鎖遊戲獎勵哦！🎉</strong></p>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -131,7 +147,7 @@
                 </div>
             </div>
 
-            <!-- 2. 测验画面 -->
+            <!-- 测验界面 -->
             <div id="quiz-screen" class="hidden space-y-6 w-full">
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-sm font-bold text-blue-500">進度</span>
@@ -161,7 +177,7 @@
                 </div>
             </div>
 
-            <!-- 3. 结果与复习画面 -->
+            <!-- 结果与复习界面 -->
             <div id="result-screen" class="hidden text-center space-y-6 animate-bounce-in w-full">
                 <div class="mb-6">
                     <div class="inline-block p-4 rounded-full bg-yellow-100 text-6xl mb-4 shadow-inner">
@@ -173,6 +189,15 @@
                         <span id="final-score">0</span><span class="text-2xl text-gray-400">/<span id="final-total">0</span></span>
                     </div>
                     <p id="score-comment" class="text-lg font-medium text-purple-600"></p>
+                </div>
+
+                <div id="perfect-reward" class="hidden bg-gradient-to-r from-yellow-300 to-orange-300 border-4 border-yellow-400 p-6 rounded-2xl animate-bounce-in">
+                    <div class="text-5xl mb-4">🎉 恭喜滿分！🎉</div>
+                    <h3 class="text-2xl font-extrabold text-yellow-900 mb-2">你獲得遊戲時間獎勵！</h3>
+                    <p class="text-yellow-800 mb-4">隨機解鎖了一個適合小朋友的小遊戲，點擊下方開始暢玩30分鐘</p>
+                    <button onclick="app.unlockRandomGame()" class="bg-yellow-800 hover:bg-yellow-900 text-white px-8 py-3 rounded-xl font-bold shadow-lg">
+                        <i class="fa-solid fa-gamepad mr-2"></i> 開始玩遊戲
+                    </button>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -192,6 +217,28 @@
                     <div id="review-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar"></div>
                 </div>
             </div>
+
+            <!-- 游戏界面 -->
+            <div id="game-screen" class="hidden space-y-4 w-full h-full">
+                <div class="flex justify-between items-center">
+                    <h2 id="game-title" class="text-2xl font-bold text-purple-600">
+                        <i class="fa-solid fa-gamepad mr-2"></i> 遊戲時間
+                    </h2>
+                    <span id="game-timer" class="text-xl font-bold bg-purple-100 text-purple-700 px-4 py-1 rounded-full">30:00</span>
+                </div>
+                <p class="text-gray-500 text-sm -mt-2">恭喜獲得30分鐘遊戲獎勵，適合10歲小朋友玩，祝你玩得開心！</p>
+                <div class="game-iframe-container w-full" style="height: 65vh;">
+                    <iframe id="game-iframe" class="w-full h-full border-0" allowfullscreen></iframe>
+                    <div id="game-timer-overlay" class="game-timer-overlay">
+                        <i class="fa-solid fa-clock mr-1"></i> <span id="overlay-time">30:00</span>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="app.exitGame()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-bold transition">
+                        <i class="fa-solid fa-rotate-left mr-2"></i> 結束遊戲
+                    </button>
+                </div>
+            </div>
         </main>
 
         <footer class="bg-gray-50 p-4 text-center text-gray-400 text-xs border-t border-gray-100 shrink-0">
@@ -200,12 +247,9 @@
     </div>
 
     <script>
-        // ==========================================
-        // 第一部分：数据层 (Data Layer)
-        // 题库独立存放，方便维护，不与UI逻辑混杂
-        // ==========================================
+        // 完整题库数据 (独立存放，完全保留你的原始内容)
         const QUESTION_BANK = [
-            // 動物/昆蟲
+            // 動物/昆蟲 (Animals/Insects)
             { word: "animal", meaning: "動物", category: "animal" },
             { word: "bear", meaning: "熊", category: "animal" },
             { word: "bee", meaning: "蜜蜂", category: "animal" },
@@ -238,7 +282,7 @@
             { word: "whale", meaning: "鯨魚", category: "animal" },
             { word: "zebra", meaning: "斑馬", category: "animal" },
 
-            // 衣服/配件
+            // 衣服 / 配件 (Clothes/Accessories)
             { word: "bag", meaning: "包包", category: "clothes" },
             { word: "cap", meaning: "棒球帽", category: "clothes" },
             { word: "clothes", meaning: "衣服", category: "clothes" },
@@ -259,7 +303,7 @@
             { word: "umbrella", meaning: "傘", category: "clothes" },
             { word: "wear", meaning: "穿、戴", category: "clothes" },
 
-            // 颜色
+            // 顏色 (Colors)
             { word: "black", meaning: "黑色的", category: "color" },
             { word: "blue", meaning: "藍色的", category: "color" },
             { word: "brown", meaning: "咖啡色", category: "color" },
@@ -273,7 +317,7 @@
             { word: "white", meaning: "白色的", category: "color" },
             { word: "yellow", meaning: "黃色的", category: "color" },
 
-            // 家庭
+            // 家庭 (Family)
             { word: "aunt", meaning: "阿姨、姑姑", category: "family" },
             { word: "brother", meaning: "哥哥、弟弟", category: "family" },
             { word: "cousin", meaning: "堂兄弟姊妹", category: "family" },
@@ -294,7 +338,7 @@
             { word: "son", meaning: "兒子", category: "family" },
             { word: "uncle", meaning: "叔叔、舅舅", category: "family" },
 
-            // 食物/饮料
+            // 食物 / 飲料 (Food/Drink)
             { word: "apple", meaning: "蘋果", category: "food" },
             { word: "banana", meaning: "香蕉", category: "food" },
             { word: "beef", meaning: "牛肉", category: "food" },
@@ -348,7 +392,7 @@
             { word: "watermelon", meaning: "西瓜", category: "food" },
             { word: "yummy", meaning: "美味的", category: "food" },
 
-            // 房子/居家
+            // 房子 / 居家 (House/Home)
             { word: "bathroom", meaning: "浴室", category: "house" },
             { word: "bed", meaning: "床", category: "house" },
             { word: "bedroom", meaning: "臥房", category: "house" },
@@ -356,7 +400,7 @@
             { word: "clean", meaning: "乾淨的 / 清理", category: "house" },
             { word: "computer", meaning: "電腦", category: "house" },
             { word: "desk", meaning: "桌子", category: "house" },
-            { word: "dining room", meaning: "餐廳", category: "house" },
+            { word: "dining room", meaning: "餐廳（家裡）", category: "house" },
             { word: "door", meaning: "門", category: "house" },
             { word: "fan", meaning: "電扇", category: "house" },
             { word: "floor", meaning: "地板", category: "house" },
@@ -384,7 +428,7 @@
             { word: "wash", meaning: "洗", category: "house" },
             { word: "window", meaning: "窗戶", category: "house" },
 
-            // 数字/金额
+            // 數字 / 金額 (Numbers/Money)
             { word: "all", meaning: "全部", category: "number" },
             { word: "both", meaning: "兩者都", category: "number" },
             { word: "eight", meaning: "八", category: "number" },
@@ -397,7 +441,6 @@
             { word: "five", meaning: "五", category: "number" },
             { word: "forty", meaning: "四十", category: "number" },
             { word: "four", meaning: "四", category: "number" },
-            { word: "fourteen", meaning: "十四", category: "number" },
             { word: "nine", meaning: "九", category: "number" },
             { word: "nineteen", meaning: "十九", category: "number" },
             { word: "ninety", meaning: "九十", category: "number" },
@@ -419,195 +462,193 @@
             { word: "two", meaning: "二", category: "number" }
         ];
 
-        // ==========================================
-        // 第二部分：应用逻辑层 (Application Logic)
-        // 负责状态管理、持久化存储和交互控制
-        // ==========================================
+        // 适合10岁小朋友的游戏列表 (免费、无需登录、教育或益智类)
+        const KID_GAMES = [
+            { name: "Minecraft Classic (我的世界)", url: "https://classic.minecraft.net/" },
+            { name: "Pac-Man (吃豆人)", url: "https://www.google.com/logos/2010/pacman/ihs.html" },
+            { name: "Snake Game (贪吃蛇)", url: "https://playsnake.org/" },
+            { name: "2048 Puzzle", url: "https://play2048.co/" },
+            { name: "GeoGuessr (简易版)", url: "https://www.geoguessr.com/free" },
+            { name: "Quick Draw (AI猜画)", url: "https://quickdraw.withgoogle.com/" },
+            { name: "Chess.com (儿童国际象棋)", url: "https://www.chess.com/play/computer" }
+        ];
+
         const app = {
-            state: {
-                currentQuestions: [],
-                currentIndex: 0,
-                score: 0,
-                wrongAnswers: [],
-                isReviewMode: false,
-                quizId: null // 用于 localStorage 恢复进度
-            },
+            currentQuestions: [],
+            currentIndex: 0,
+            score: 0,
+            wrongAnswers: [],
+            gameTimerInterval: null,
+            remainingTime: 1800, // 30 minutes in seconds
 
             init() {
-                this.checkSavedProgress();
+                this.resetApp();
             },
 
-            // 工具函数：洗牌算法
-            shuffle(array) {
-                return array.sort(() => Math.random() - 0.5);
+            resetApp() {
+                this.stopGameTimer();
+                document.getElementById('start-screen').classList.remove('hidden');
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+                document.getElementById('review-section').classList.add('hidden');
+                document.getElementById('perfect-reward').classList.add('hidden');
+                this.wrongAnswers = [];
             },
 
-            // 工具函数：生成唯一ID
-            generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2);
-            },
-
-            // 核心功能：开始测验
             startQuiz(category) {
                 let pool = [];
                 if (category === 'mixed') {
                     pool = [...QUESTION_BANK];
+                    // Shuffle and pick 50
+                    pool.sort(() => Math.random() - 0.5);
+                    this.currentQuestions = pool.slice(0, 50);
                 } else {
                     pool = QUESTION_BANK.filter(q => q.category === category);
+                    // If category has less than 10, take all, else shuffle and take 10
+                    pool.sort(() => Math.random() - 0.5);
+                    this.currentQuestions = pool.slice(0, Math.min(pool.length, 10));
                 }
 
-                // 随机抽取题目，如果是混合模式则最多50题，其他模式全量或限制数量
-                let selected = this.shuffle([...pool]);
-                if (category === 'mixed') {
-                    selected = selected.slice(0, 50);
-                } else if (selected.length > 20) {
-                    selected = selected.slice(0, 20); // 分类测验限制20题以免太长
+                if (this.currentQuestions.length === 0) {
+                    alert("該分類暫無題目");
+                    return;
                 }
 
-                this.state.currentQuestions = selected.map(q => ({
-                    ...q,
-                    id: this.generateId(),
-                    options: this.generateOptions(q)
-                }));
+                this.currentIndex = 0;
+                this.score = 0;
+                this.wrongAnswers = [];
                 
-                this.state.currentIndex = 0;
-                this.state.score = 0;
-                this.state.wrongAnswers = [];
-                this.state.isReviewMode = false;
-                this.state.quizId = this.generateId();
-
-                this.saveProgress();
-                this.renderQuizScreen();
-            },
-
-            // 生成干扰选项
-            generateOptions(correctItem) {
-                const others = QUESTION_BANK.filter(q => q.word !== correctItem.word);
-                const shuffledOthers = this.shuffle(others).slice(0, 3);
-                const options = [...shuffledOthers, correctItem];
-                return this.shuffle(options);
-            },
-
-            // 渲染测验界面
-            renderQuizScreen() {
                 document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.remove('hidden');
-
-                this.updateProgressBar();
-                this.loadQuestion();
+                document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.add('hidden');
+                
+                this.renderQuestion();
             },
 
-            // 加载当前题目
-            loadQuestion() {
-                const q = this.state.currentQuestions[this.state.currentIndex];
+            renderQuestion() {
+                const q = this.currentQuestions[this.currentIndex];
+                const total = this.currentQuestions.length;
+                
+                document.getElementById('current-q-num').textContent = this.currentIndex + 1;
+                document.getElementById('total-q-num').textContent = total;
+                document.getElementById('progress-bar').style.width = `${((this.currentIndex) / total) * 100}%`;
                 document.getElementById('question-word').textContent = q.word;
-                document.getElementById('current-q-num').textContent = this.state.currentIndex + 1;
-                document.getElementById('total-q-num').textContent = this.state.currentQuestions.length;
-                
-                const container = document.getElementById('options-container');
-                container.innerHTML = '';
-                
                 document.getElementById('feedback-msg').classList.add('hidden');
                 document.getElementById('next-btn').classList.add('hidden');
 
-                q.options.forEach(opt => {
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-lg font-semibold text-gray-700 hover:border-blue-300 hover:bg-blue-50';
-                    btn.textContent = opt.meaning;
-                    btn.onclick = () => this.handleAnswer(btn, opt, q);
-                    container.appendChild(btn);
-                });
+                // Generate options
+                const optionsContainer = document.getElementById('options-container');
+                optionsContainer.innerHTML = '';
 
-                this.saveProgress();
+                // Get 3 random wrong answers
+                let distractors = QUESTION_BANK.filter(item => item.meaning !== q.meaning);
+                distractors.sort(() => Math.random() - 0.5);
+                let options = [q, ...distractors.slice(0, 3)];
+                options.sort(() => Math.random() - 0.5);
+
+                options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-lg font-semibold text-gray-700 hover:border-blue-400 hover:bg-blue-50';
+                    btn.textContent = opt.meaning;
+                    btn.onclick = () => this.checkAnswer(btn, opt, q);
+                    optionsContainer.appendChild(btn);
+                });
             },
 
-            // 处理答题
-            handleAnswer(btn, selectedOpt, correctQ) {
-                // 禁用所有按钮
+            speakWord() {
+                const word = this.currentQuestions[this.currentIndex].word;
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            },
+
+            checkAnswer(btn, selected, correct) {
+                // Disable all buttons
                 const buttons = document.querySelectorAll('.option-btn');
                 buttons.forEach(b => b.disabled = true);
 
-                const isCorrect = selectedOpt.word === correctQ.word;
                 const feedback = document.getElementById('feedback-msg');
                 feedback.classList.remove('hidden');
 
-                if (isCorrect) {
+                if (selected.meaning === correct.meaning) {
                     btn.classList.add('correct');
-                    this.state.score++;
-                    feedback.textContent = '🎉 答對了！好棒！';
-                    feedback.className = 'text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-green-100 text-green-700';
+                    this.score++;
+                    feedback.textContent = "✅ 答對了！太棒了！";
+                    feedback.className = "text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-green-100 text-green-700";
                 } else {
                     btn.classList.add('wrong');
-                    // 高亮正确答案
+                    // Highlight correct one
                     buttons.forEach(b => {
-                        if (b.textContent === correctQ.meaning) b.classList.add('correct');
+                        if (b.textContent === correct.meaning) b.classList.add('correct');
                     });
-                    this.state.wrongAnswers.push(correctQ);
-                    feedback.textContent = `😅 答錯了，正確答案是：${correctQ.meaning}`;
-                    feedback.className = 'text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-red-100 text-red-700';
+                    feedback.textContent = `❌ 答錯了，正確答案是：${correct.meaning}`;
+                    feedback.className = "text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-red-100 text-red-700";
+                    
+                    // Add to wrong answers for review
+                    if (!this.wrongAnswers.find(w => w.word === correct.word)) {
+                        this.wrongAnswers.push(correct);
+                    }
                 }
 
                 document.getElementById('next-btn').classList.remove('hidden');
-                this.saveProgress();
             },
 
-            // 下一题
             nextQuestion() {
-                this.state.currentIndex++;
-                if (this.state.currentIndex < this.state.currentQuestions.length) {
-                    this.loadQuestion();
+                this.currentIndex++;
+                if (this.currentIndex < this.currentQuestions.length) {
+                    this.renderQuestion();
                 } else {
-                    this.finishQuiz();
+                    this.showResult();
                 }
             },
 
-            // 更新进度条
-            updateProgressBar() {
-                const percent = ((this.state.currentIndex) / this.state.currentQuestions.length) * 100;
-                document.getElementById('progress-bar').style.width = `${percent}%`;
-            },
-
-            // 结束测验
-            finishQuiz() {
+            showResult() {
                 document.getElementById('quiz-screen').classList.add('hidden');
                 document.getElementById('result-screen').classList.remove('hidden');
                 
-                document.getElementById('final-score').textContent = this.state.score;
-                document.getElementById('final-total').textContent = this.state.currentQuestions.length;
+                const total = this.currentQuestions.length;
+                document.getElementById('final-score').textContent = this.score;
+                document.getElementById('final-total').textContent = total;
                 
-                const percentage = (this.state.score / this.state.currentQuestions.length) * 100;
+                const percentage = (this.score / total) * 100;
                 const comment = document.getElementById('score-comment');
-                if (percentage === 100) comment.textContent = "太厲害了！滿分！🌟";
-                else if (percentage >= 80) comment.textContent = "做得很好！繼續保持！👍";
-                else if (percentage >= 60) comment.textContent = "不錯喔！再加油一點！💪";
-                else comment.textContent = "別灰心，多練習幾次就會了！📚";
-
-                // 显示/隐藏复习按钮
+                const reward = document.getElementById('perfect-reward');
                 const reviewBtn = document.getElementById('review-btn');
-                if (this.state.wrongAnswers.length > 0) {
+
+                if (percentage === 100) {
+                    comment.textContent = "完美！你是英文小天才！🌟";
+                    reward.classList.remove('hidden');
+                } else if (percentage >= 80) {
+                    comment.textContent = "非常優秀！繼續保持！💪";
+                    reward.classList.add('hidden');
+                } else if (percentage >= 60) {
+                    comment.textContent = "不錯哦，再加油一點！📚";
+                    reward.classList.add('hidden');
+                } else {
+                    comment.textContent = "別灰心，多複習幾次就會了！❤️";
+                    reward.classList.add('hidden');
+                }
+
+                if (this.wrongAnswers.length > 0) {
                     reviewBtn.classList.remove('hidden');
-                    reviewBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> 錯題複習 (${this.state.wrongAnswers.length})`;
                 } else {
                     reviewBtn.classList.add('hidden');
+                    document.getElementById('review-section').classList.add('hidden');
                 }
-                
-                document.getElementById('review-section').classList.add('hidden');
-                
-                // 清除已完成的进度保存
-                localStorage.removeItem('englishQuizProgress');
             },
 
-            // 显示错题复习
             showReview() {
                 const section = document.getElementById('review-section');
-                section.classList.remove('hidden');
                 const list = document.getElementById('review-list');
+                section.classList.remove('hidden');
                 list.innerHTML = '';
 
-                this.state.wrongAnswers.forEach(item => {
+                this.wrongAnswers.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = 'bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:bg-orange-100 transition';
+                    div.className = "bg-orange-50 border border-orange-200 p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-orange-100 transition";
                     div.innerHTML = `
                         <div>
                             <span class="font-bold text-orange-800 text-lg">${item.word}</span>
@@ -615,83 +656,66 @@
                         </div>
                         <i class="fa-solid fa-volume-high text-orange-400"></i>
                     `;
-                    div.onclick = () => this.speakText(item.word);
+                    div.onclick = () => {
+                        const u = new SpeechSynthesisUtterance(item.word);
+                        u.lang = 'en-US';
+                        window.speechSynthesis.speak(u);
+                    };
                     list.appendChild(div);
                 });
                 
-                // 滚动到底部
-                setTimeout(() => {
-                    section.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
+                // Scroll to review section
+                section.scrollIntoView({ behavior: 'smooth' });
             },
 
-            // 语音播放
-            speakWord() {
-                const word = document.getElementById('question-word').textContent;
-                this.speakText(word);
-            },
-
-            speakText(text) {
-                if ('speechSynthesis' in window) {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US';
-                    utterance.rate = 0.8; // 稍微慢一点适合小学生
-                    window.speechSynthesis.speak(utterance);
-                } else {
-                    alert("您的瀏覽器不支持語音功能");
-                }
-            },
-
-            // 本地存储：保存进度
-            saveProgress() {
-                const data = {
-                    timestamp: Date.now(),
-                    state: this.state
-                };
-                localStorage.setItem('englishQuizProgress', JSON.stringify(data));
-            },
-
-            // 本地存储：检查并恢复进度
-            checkSavedProgress() {
-                const saved = localStorage.getItem('englishQuizProgress');
-                if (saved) {
-                    try {
-                        const data = JSON.parse(saved);
-                        // 如果保存时间在24小时内，且测验未完成（currentIndex < total）
-                        if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
-                            const s = data.state;
-                            if (s.currentQuestions && s.currentIndex < s.currentQuestions.length) {
-                                if (confirm("檢測到您上次有未完成的測驗，是否繼續？")) {
-                                    this.state = s;
-                                    this.renderQuizScreen();
-                                    return;
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.error("恢復進度失敗", e);
-                    }
-                }
-            },
-
-            // 重置应用
-            resetApp() {
-                localStorage.removeItem('englishQuizProgress');
-                document.getElementById('quiz-screen').classList.add('hidden');
+            unlockRandomGame() {
+                const randomGame = KID_GAMES[Math.floor(Math.random() * KID_GAMES.length)];
                 document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                
+                document.getElementById('game-title').innerHTML = `<i class="fa-solid fa-gamepad mr-2"></i> ${randomGame.name}`;
+                document.getElementById('game-iframe').src = randomGame.url;
+                
+                this.startGameTimer();
+            },
+
+            startGameTimer() {
+                this.remainingTime = 1800; // 30 mins
+                this.updateTimerDisplay();
+                this.gameTimerInterval = setInterval(() => {
+                    this.remainingTime--;
+                    this.updateTimerDisplay();
+                    if (this.remainingTime <= 0) {
+                        this.exitGame();
+                        alert("遊戲時間到！休息一下吧～");
+                    }
+                }, 1000);
+            },
+
+            stopGameTimer() {
+                if (this.gameTimerInterval) {
+                    clearInterval(this.gameTimerInterval);
+                    this.gameTimerInterval = null;
+                }
+            },
+
+            updateTimerDisplay() {
+                const m = Math.floor(this.remainingTime / 60).toString().padStart(2, '0');
+                const s = (this.remainingTime % 60).toString().padStart(2, '0');
+                const timeStr = `${m}:${s}`;
+                document.getElementById('game-timer').textContent = timeStr;
+                document.getElementById('overlay-time').textContent = timeStr;
+            },
+
+            exitGame() {
+                this.stopGameTimer();
+                document.getElementById('game-iframe').src = "";
+                document.getElementById('game-screen').classList.add('hidden');
                 document.getElementById('start-screen').classList.remove('hidden');
-                this.state = {
-                    currentQuestions: [],
-                    currentIndex: 0,
-                    score: 0,
-                    wrongAnswers: [],
-                    isReviewMode: false,
-                    quizId: null
-                };
             }
         };
 
-        // 启动应用
+        // Initialize app
         window.onload = () => app.init();
     </script>
 </body>
