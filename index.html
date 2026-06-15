@@ -3,11 +3,9 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>快樂學英文 - 單字測驗與複習</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -17,34 +15,34 @@
             background-color: #f0f9ff;
             background-image: radial-gradient(#bae6fd 1px, transparent 1px);
             background-size: 20px 20px;
+            touch-action: manipulation; /* 优化手机点击响应 */
         }
 
         .card-hover {
             transition: all 0.3s ease;
         }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        .card-hover:active {
+            transform: scale(0.98);
         }
 
         .option-btn {
             transition: all 0.2s;
+            min-height: 56px; /* 适合手指点击的高度 */
         }
-        .option-btn:hover:not(:disabled) {
-            transform: scale(1.02);
+        .option-btn:active:not(:disabled) {
+            transform: scale(0.98);
         }
         .option-btn.correct {
-            background-color: #86efac !important; /* green-300 */
+            background-color: #86efac !important;
             border-color: #22c55e !important;
             color: #14532d !important;
         }
         .option-btn.wrong {
-            background-color: #fca5a5 !important; /* red-300 */
+            background-color: #fca5a5 !important;
             border-color: #ef4444 !important;
             color: #7f1d1d !important;
         }
 
-        /* 動畫效果 */
         @keyframes bounce-in {
             0% { transform: scale(0.3); opacity: 0; }
             50% { transform: scale(1.05); }
@@ -54,21 +52,9 @@
         .animate-bounce-in {
             animation: bounce-in 0.5s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
         }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #f00;
-            animation: fall linear forwards;
-        }
-        @keyframes fall {
-            to { transform: translateY(100vh) rotate(720deg); }
-        }
         
-        /* 自定義滾動條 */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #f1f1f1; 
@@ -78,70 +64,75 @@
             background: #cbd5e1; 
             border-radius: 4px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 text-slate-700">
-
-    <!-- 主容器 -->
-    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-100 relative">
-        
-        <!-- 頂部導航/標題 -->
-        <header class="bg-blue-500 p-6 text-white flex justify-between items-center">
+    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-blue-100 relative flex flex-col" style="min-height: 80vh;">
+        <!-- 头部导航 -->
+        <header class="bg-blue-500 p-4 sm:p-6 text-white flex justify-between items-center shrink-0">
             <div class="flex items-center gap-3">
                 <div class="bg-white/20 p-2 rounded-lg">
                     <i class="fa-solid fa-graduation-cap text-2xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold">快樂學英文</h1>
-                    <p class="text-blue-100 text-sm">小學生單字挑戰賽</p>
+                    <h1 class="text-xl sm:text-2xl font-bold">快樂學英文</h1>
+                    <p class="text-blue-100 text-xs sm:text-sm">小學生單字挑戰賽</p>
                 </div>
             </div>
-            <button onclick="app.resetApp()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-semibold transition">
-                <i class="fa-solid fa-house mr-1"></i> 首頁
+            <button onclick="app.resetApp()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-full text-sm font-semibold transition">
+                <i class="fa-solid fa-house mr-1"></i> <span class="hidden sm:inline">首頁</span>
             </button>
         </header>
 
-        <!-- 內容區域 -->
-        <main class="p-6 min-h-[400px] flex flex-col justify-center">
+        <!-- 主内容区域 -->
+        <main class="p-4 sm:p-6 flex-grow flex flex-col justify-center overflow-y-auto custom-scrollbar">
             
-            <!-- 1. 開始畫面 -->
-            <div id="start-screen" class="text-center space-y-6 animate-bounce-in">
-                <div class="mb-8">
-                    <img src="https://picsum.photos/seed/englishkids/400/200" alt="孩子們快樂學習英文的插圖" class="rounded-2xl shadow-md mx-auto mb-6 w-full max-w-md object-cover h-48">
-                    <h2 class="text-3xl font-extrabold text-blue-600 mb-2">準備好挑戰了嗎？</h2>
-                    <p class="text-gray-500">選擇一個難度開始測驗，答錯的題目會在最後複習哦！</p>
+            <!-- 1. 开始画面 -->
+            <div id="start-screen" class="text-center space-y-6 animate-bounce-in w-full">
+                <div class="mb-6">
+                    <img src="https://picsum.photos/seed/englishkids/400/200" alt="孩子們快樂學習英文的插圖" class="rounded-2xl shadow-md mx-auto mb-4 w-full max-w-md object-cover h-40 sm:h-48">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-600 mb-2">準備好挑戰了嗎？</h2>
+                    <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習</p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onclick="app.startQuiz('easy')" class="card-hover bg-green-100 hover:bg-green-200 border-2 border-green-300 p-6 rounded-2xl text-center group">
-                        <div class="text-4xl mb-2 group-hover:scale-110 transition">🌱</div>
-                        <h3 class="font-bold text-green-800 text-lg">基礎篇</h3>
-                        <p class="text-green-600 text-sm">簡單常見單字</p>
+                <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <button onclick="app.startQuiz('animal')" class="card-hover bg-green-100 hover:bg-green-200 border-2 border-green-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🐯</div>
+                        <h3 class="font-bold text-green-800 text-base sm:text-lg">動物昆蟲</h3>
                     </button>
-                    <button onclick="app.startQuiz('medium')" class="card-hover bg-yellow-100 hover:bg-yellow-200 border-2 border-yellow-300 p-6 rounded-2xl text-center group">
-                        <div class="text-4xl mb-2 group-hover:scale-110 transition">🚀</div>
-                        <h3 class="font-bold text-yellow-800 text-lg">進階篇</h3>
-                        <p class="text-yellow-600 text-sm">學校常用單字</p>
+                    <button onclick="app.startQuiz('clothes')" class="card-hover bg-yellow-100 hover:bg-yellow-200 border-2 border-yellow-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">👕</div>
+                        <h3 class="font-bold text-yellow-800 text-base sm:text-lg">衣服配件</h3>
                     </button>
-                    <button onclick="app.startQuiz('hard')" class="card-hover bg-purple-100 hover:bg-purple-200 border-2 border-purple-300 p-6 rounded-2xl text-center group">
-                        <div class="text-4xl mb-2 group-hover:scale-110 transition">👑</div>
-                        <h3 class="font-bold text-purple-800 text-lg">挑戰篇</h3>
-                        <p class="text-purple-600 text-sm">較長或複雜單字</p>
+                    <button onclick="app.startQuiz('color')" class="card-hover bg-purple-100 hover:bg-purple-200 border-2 border-purple-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🎨</div>
+                        <h3 class="font-bold text-purple-800 text-base sm:text-lg">各種顏色</h3>
                     </button>
-                    <button onclick="app.startQuiz('mixed')" class="card-hover bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 p-6 rounded-2xl text-center group">
-                        <div class="text-4xl mb-2 group-hover:scale-110 transition">🎲</div>
-                        <h3 class="font-bold text-blue-800 text-lg">綜合大挑戰</h3>
-                        <p class="text-blue-600 text-sm">隨機50題混合測驗</p>
+                    <button onclick="app.startQuiz('family')" class="card-hover bg-pink-100 hover:bg-pink-200 border-2 border-pink-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">👨‍👩‍👧‍👦</div>
+                        <h3 class="font-bold text-pink-800 text-base sm:text-lg">家庭成員</h3>
+                    </button>
+                    <button onclick="app.startQuiz('food')" class="card-hover bg-orange-100 hover:bg-orange-200 border-2 border-orange-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🍔</div>
+                        <h3 class="font-bold text-orange-800 text-base sm:text-lg">食物飲料</h3>
+                    </button>
+                    <button onclick="app.startQuiz('house')" class="card-hover bg-teal-100 hover:bg-teal-200 border-2 border-teal-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🏠</div>
+                        <h3 class="font-bold text-teal-800 text-base sm:text-lg">房子居家</h3>
+                    </button>
+                    <button onclick="app.startQuiz('number')" class="card-hover bg-indigo-100 hover:bg-indigo-200 border-2 border-indigo-300 p-4 sm:p-6 rounded-2xl text-center group">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🔢</div>
+                        <h3 class="font-bold text-indigo-800 text-base sm:text-lg">數字金額</h3>
+                    </button>
+                    <button onclick="app.startQuiz('mixed')" class="card-hover bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 p-4 sm:p-6 rounded-2xl text-center group col-span-2 sm:col-span-2">
+                        <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🎲</div>
+                        <h3 class="font-bold text-blue-800 text-base sm:text-lg">綜合大挑戰 (隨機50題)</h3>
                     </button>
                 </div>
             </div>
 
-            <!-- 2. 測驗畫面 -->
-            <div id="quiz-screen" class="hidden space-y-6">
-                <!-- 進度條 -->
+            <!-- 2. 测验画面 -->
+            <div id="quiz-screen" class="hidden space-y-6 w-full">
                 <div class="flex justify-between items-end mb-2">
                     <span class="text-sm font-bold text-blue-500">進度</span>
                     <span class="text-sm font-bold text-blue-500"><span id="current-q-num">1</span> / <span id="total-q-num">10</span></span>
@@ -150,46 +141,40 @@
                     <div id="progress-bar" class="bg-blue-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
 
-                <!-- 題目卡片 -->
-                <div class="bg-blue-50 rounded-2xl p-8 text-center border-2 border-blue-100 relative">
+                <div class="bg-blue-50 rounded-2xl p-6 sm:p-8 text-center border-2 border-blue-100 relative">
                     <span class="absolute top-4 right-4 text-4xl opacity-20">?</span>
-                    <h3 class="text-gray-500 text-sm uppercase tracking-wider font-bold mb-2">請選出正確的中文意思</h3>
-                    <h2 id="question-word" class="text-5xl font-black text-blue-600 mb-4 break-words">Apple</h2>
-                    <button onclick="app.speakWord()" class="bg-white border border-blue-200 text-blue-500 px-4 py-2 rounded-full hover:bg-blue-50 transition shadow-sm">
+                    <h3 class="text-gray-500 text-xs sm:text-sm uppercase tracking-wider font-bold mb-2">請選出正確的中文意思</h3>
+                    <h2 id="question-word" class="text-4xl sm:text-5xl font-black text-blue-600 mb-4 break-words">Apple</h2>
+                    <button onclick="app.speakWord()" class="bg-white border border-blue-200 text-blue-500 px-4 py-2 rounded-full hover:bg-blue-50 transition shadow-sm text-sm sm:text-base">
                         <i class="fa-solid fa-volume-high mr-2"></i> 聽發音
                     </button>
                 </div>
 
-                <!-- 選項區域 -->
-                <div id="options-container" class="grid grid-cols-1 gap-3">
-                    <!-- 選項由 JS 生成 -->
-                </div>
+                <div id="options-container" class="grid grid-cols-1 gap-3"></div>
 
-                <!-- 反饋訊息 (預設隱藏) -->
                 <div id="feedback-msg" class="hidden text-center p-4 rounded-xl font-bold text-lg animate-bounce-in"></div>
                 
                 <div class="flex justify-end pt-4">
-                    <button id="next-btn" onclick="app.nextQuestion()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition transform hover:scale-105">
+                    <button id="next-btn" onclick="app.nextQuestion()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition transform hover:scale-105 w-full sm:w-auto">
                         下一題 <i class="fa-solid fa-arrow-right ml-2"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- 3. 結果與複習畫面 -->
-            <div id="result-screen" class="hidden text-center space-y-6 animate-bounce-in">
+            <!-- 3. 结果与复习画面 -->
+            <div id="result-screen" class="hidden text-center space-y-6 animate-bounce-in w-full">
                 <div class="mb-6">
                     <div class="inline-block p-4 rounded-full bg-yellow-100 text-6xl mb-4 shadow-inner">
                         🏆
                     </div>
-                    <h2 class="text-3xl font-bold text-gray-800">測驗完成！</h2>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">測驗完成！</h2>
                     <p class="text-gray-500 mt-2">你的得分是</p>
-                    <div class="text-6xl font-black text-blue-600 my-4">
+                    <div class="text-5xl sm:text-6xl font-black text-blue-600 my-4">
                         <span id="final-score">0</span><span class="text-2xl text-gray-400">/<span id="final-total">0</span></span>
                     </div>
                     <p id="score-comment" class="text-lg font-medium text-purple-600"></p>
                 </div>
 
-                <!-- 操作按鈕 -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <button id="review-btn" onclick="app.showReview()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-bold shadow-md transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-book-open"></i> 錯題複習
@@ -199,545 +184,515 @@
                     </button>
                 </div>
 
-                <!-- 複習區域 (預設隱藏) -->
                 <div id="review-section" class="hidden mt-8 border-t-2 border-dashed border-gray-200 pt-6 text-left">
                     <h3 class="text-xl font-bold text-gray-700 mb-4 flex items-center">
                         <i class="fa-solid fa-clipboard-list text-orange-500 mr-2"></i> 
                         重點複習 <span class="text-sm font-normal text-gray-400 ml-2">(點擊卡片可聽發音)</span>
                     </h3>
-                    <div id="review-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                        <!-- 複習項目由 JS 生成 -->
-                    </div>
+                    <div id="review-list" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar"></div>
                 </div>
             </div>
-
         </main>
 
-        <!-- 頁腳 -->
-        <footer class="bg-gray-50 p-4 text-center text-gray-400 text-xs border-t border-gray-100">
+        <footer class="bg-gray-50 p-4 text-center text-gray-400 text-xs border-t border-gray-100 shrink-0">
             &copy; 2026 快樂學英文 | 專為小學生設計
         </footer>
     </div>
 
     <script>
-        // --- 題庫資料 (已根據用戶提供之最新資料更新) ---
-        const questionBank = [
-            // 動物 / 昆蟲 (Animals/Insects)
-            { word: "animal", meaning: "動物", difficulty: "easy", options: ["植物", "動物", "礦物", "機器人"] },
-            { word: "bear", meaning: "熊", difficulty: "easy", options: ["狼", "熊", "虎", "獅"] },
-            { word: "bee", meaning: "蜜蜂", difficulty: "easy", options: ["蒼蠅", "蚊子", "蜜蜂", "蝴蝶"] },
-            { word: "bird", meaning: "鳥", difficulty: "easy", options: ["魚", "鳥", "蟲", "獸"] },
-            { word: "bite", meaning: "咬", difficulty: "medium", options: ["舔", "咬", "吞", "嚼"] },
-            { word: "butterfly", meaning: "蝴蝶", difficulty: "medium", options: ["蛾", "蜻蜓", "蝴蝶", "甲蟲"] },
-            { word: "cat", meaning: "貓", difficulty: "easy", options: ["狗", "貓", "鼠", "兔"] },
-            { word: "chicken", meaning: "雞", difficulty: "easy", options: ["鴨", "鵝", "雞", "鳥"] },
-            { word: "cow", meaning: "乳牛", difficulty: "easy", options: ["馬", "羊", "乳牛", "豬"] },
-            { word: "dog", meaning: "狗", difficulty: "easy", options: ["貓", "狗", "狼", "狐"] },
-            { word: "duck", meaning: "鴨子", difficulty: "easy", options: ["天鵝", "鴨子", "鴿子", "鷹"] },
-            { word: "elephant", meaning: "大象", difficulty: "medium", options: ["犀牛", "河馬", "大象", "長頸鹿"] },
-            { word: "fish", meaning: "魚", difficulty: "easy", options: ["蝦", "蟹", "魚", "貝"] },
-            { word: "frog", meaning: "青蛙", difficulty: "easy", options: ["蟾蜍", "青蛙", "蝌蚪", "蛇"] },
-            { word: "hippo", meaning: "河馬", difficulty: "medium", options: ["犀牛", "河馬", "大象", "鱷魚"] },
-            { word: "horse", meaning: "馬", difficulty: "easy", options: ["驢", "騾", "馬", "牛"] },
-            { word: "koala", meaning: "無尾熊", difficulty: "medium", options: ["袋鼠", "無尾熊", "樹懶", "猴子"] },
-            { word: "lion", meaning: "獅子", difficulty: "easy", options: ["老虎", "獅子", "豹", "狼"] },
-            { word: "mice", meaning: "老鼠（複數）", difficulty: "hard", options: ["老鼠（單數）", "老鼠（複數）", "蝙蝠", "松鼠"] },
-            { word: "monkey", meaning: "猴子", difficulty: "easy", options: ["猩猩", "猴子", "猿", "狐猴"] },
-            { word: "mouse", meaning: "老鼠", difficulty: "easy", options: ["倉鼠", "老鼠", "田鼠", "鼴鼠"] },
-            { word: "panda", meaning: "大貓熊", difficulty: "medium", options: ["小熊貓", "大貓熊", "黑熊", "棕熊"] },
-            { word: "pet", meaning: "寵物", difficulty: "medium", options: ["野獸", "寵物", "家畜", "昆蟲"] },
-            { word: "pig", meaning: "豬", difficulty: "easy", options: ["牛", "羊", "豬", "馬"] },
-            { word: "rabbit", meaning: "兔子", difficulty: "easy", options: ["野兔", "兔子", "倉鼠", "天竺鼠"] },
-            { word: "sheep", meaning: "綿羊", difficulty: "medium", options: ["山羊", "綿羊", "羚羊", "駱駝"] },
-            { word: "snake", meaning: "蛇", difficulty: "easy", options: ["蜥蜴", "蛇", "烏龜", "鱷魚"] },
-            { word: "spider", meaning: "蜘蛛", difficulty: "medium", options: ["螞蟻", "蜘蛛", "蠍子", "蜈蚣"] },
-            { word: "tiger", meaning: "老虎", difficulty: "easy", options: ["獅子", "老虎", "花豹", "美洲獅"] },
-            { word: "whale", meaning: "鯨魚", difficulty: "medium", options: ["鯊魚", "鯨魚", "海豚", "海豹"] },
-            { word: "zebra", meaning: "斑馬", difficulty: "medium", options: ["馬", "驢", "斑馬", "羚羊"] },
+        // ==========================================
+        // 第一部分：数据层 (Data Layer)
+        // 题库独立存放，方便维护，不与UI逻辑混杂
+        // ==========================================
+        const QUESTION_BANK = [
+            // 動物/昆蟲
+            { word: "animal", meaning: "動物", category: "animal" },
+            { word: "bear", meaning: "熊", category: "animal" },
+            { word: "bee", meaning: "蜜蜂", category: "animal" },
+            { word: "bird", meaning: "鳥", category: "animal" },
+            { word: "bite", meaning: "咬", category: "animal" },
+            { word: "butterfly", meaning: "蝴蝶", category: "animal" },
+            { word: "cat", meaning: "貓", category: "animal" },
+            { word: "chicken", meaning: "雞", category: "animal" },
+            { word: "cow", meaning: "乳牛", category: "animal" },
+            { word: "dog", meaning: "狗", category: "animal" },
+            { word: "duck", meaning: "鴨子", category: "animal" },
+            { word: "elephant", meaning: "大象", category: "animal" },
+            { word: "fish", meaning: "魚", category: "animal" },
+            { word: "frog", meaning: "青蛙", category: "animal" },
+            { word: "hippo", meaning: "河馬", category: "animal" },
+            { word: "horse", meaning: "馬", category: "animal" },
+            { word: "koala", meaning: "無尾熊", category: "animal" },
+            { word: "lion", meaning: "獅子", category: "animal" },
+            { word: "mice", meaning: "老鼠（複數）", category: "animal" },
+            { word: "monkey", meaning: "猴子", category: "animal" },
+            { word: "mouse", meaning: "老鼠", category: "animal" },
+            { word: "panda", meaning: "大貓熊", category: "animal" },
+            { word: "pet", meaning: "寵物", category: "animal" },
+            { word: "pig", meaning: "豬", category: "animal" },
+            { word: "rabbit", meaning: "兔子", category: "animal" },
+            { word: "sheep", meaning: "綿羊", category: "animal" },
+            { word: "snake", meaning: "蛇", category: "animal" },
+            { word: "spider", meaning: "蜘蛛", category: "animal" },
+            { word: "tiger", meaning: "老虎", category: "animal" },
+            { word: "whale", meaning: "鯨魚", category: "animal" },
+            { word: "zebra", meaning: "斑馬", category: "animal" },
 
-            // 衣服 / 配件 (Clothes/Accessories)
-            { word: "bag", meaning: "包包", difficulty: "easy", options: ["盒子", "包包", "袋子", "箱子"] },
-            { word: "cap", meaning: "棒球帽", difficulty: "medium", options: ["禮帽", "棒球帽", "毛帽", "草帽"] },
-            { word: "clothes", meaning: "衣服", difficulty: "easy", options: ["布料", "衣服", "飾品", "鞋子"] },
-            { word: "coat", meaning: "外套", difficulty: "medium", options: ["襯衫", "外套", "夾克", "大衣"] },
-            { word: "dress", meaning: "洋裝", difficulty: "medium", options: ["裙子", "洋裝", "套裝", "睡衣"] },
-            { word: "glasses", meaning: "眼鏡", difficulty: "medium", options: ["墨鏡", "眼鏡", "隱形眼鏡", "望遠鏡"] },
-            { word: "hat", meaning: "帽子", difficulty: "easy", options: ["帽子", "頭巾", "髮帶", "耳罩"] },
-            { word: "jacket", meaning: "夾克外套", difficulty: "medium", options: ["背心", "夾克外套", "毛衣", "風衣"] },
-            { word: "pants", meaning: "長褲", difficulty: "medium", options: ["短褲", "長褲", "牛仔褲", "西裝褲"] },
-            { word: "pocket", meaning: "口袋", difficulty: "medium", options: ["鈕扣", "口袋", "拉鍊", "領子"] },
-            { word: "shirt", meaning: "襯衫", difficulty: "medium", options: ["T恤", "襯衫", "背心", " Polo衫"] },
-            { word: "shoes", meaning: "鞋子", difficulty: "easy", options: ["襪子", "鞋子", "拖鞋", "靴子"] },
-            { word: "shorts", meaning: "短褲", difficulty: "medium", options: ["內褲", "短褲", "泳褲", "長褲"] },
-            { word: "skirt", meaning: "裙子", difficulty: "medium", options: ["洋裝", "裙子", "圍裙", "披肩"] },
-            { word: "socks", meaning: "襪子", difficulty: "easy", options: ["手套", "襪子", "圍巾", "帽子"] },
-            { word: "sweater", meaning: "毛衣", difficulty: "medium", options: ["衛衣", "毛衣", "外套", "背心"] },
-            { word: "T-shirt", meaning: "T恤", difficulty: "easy", options: ["襯衫", "T恤", "背心", "上衣"] },
-            { word: "umbrella", meaning: "傘", difficulty: "medium", options: ["雨衣", "傘", "雨鞋", "斗篷"] },
-            { word: "wear", meaning: "穿、戴", difficulty: "medium", options: ["脫", "穿、戴", "洗", "摺"] },
+            // 衣服/配件
+            { word: "bag", meaning: "包包", category: "clothes" },
+            { word: "cap", meaning: "棒球帽", category: "clothes" },
+            { word: "clothes", meaning: "衣服", category: "clothes" },
+            { word: "coat", meaning: "外套", category: "clothes" },
+            { word: "dress", meaning: "洋裝", category: "clothes" },
+            { word: "glasses", meaning: "眼鏡", category: "clothes" },
+            { word: "hat", meaning: "帽子", category: "clothes" },
+            { word: "jacket", meaning: "夾克外套", category: "clothes" },
+            { word: "pants", meaning: "長褲", category: "clothes" },
+            { word: "pocket", meaning: "口袋", category: "clothes" },
+            { word: "shirt", meaning: "襯衫", category: "clothes" },
+            { word: "shoes", meaning: "鞋子", category: "clothes" },
+            { word: "shorts", meaning: "短褲", category: "clothes" },
+            { word: "skirt", meaning: "裙子", category: "clothes" },
+            { word: "socks", meaning: "襪子", category: "clothes" },
+            { word: "sweater", meaning: "毛衣", category: "clothes" },
+            { word: "T-shirt", meaning: "T恤", category: "clothes" },
+            { word: "umbrella", meaning: "傘", category: "clothes" },
+            { word: "wear", meaning: "穿、戴", category: "clothes" },
 
-            // 顏色 (Colors)
-            { word: "black", meaning: "黑色的", difficulty: "easy", options: ["白色的", "黑色的", "紅色的", "藍色的"] },
-            { word: "blue", meaning: "藍色的", difficulty: "easy", options: ["綠色的", "藍色的", "紫色的", "黃色的"] },
-            { word: "brown", meaning: "咖啡色", difficulty: "easy", options: ["橘色", "咖啡色", "灰色", "粉色"] },
-            { word: "color", meaning: "顏色", difficulty: "easy", options: ["形狀", "顏色", "大小", "味道"] },
-            { word: "gray", meaning: "灰色的", difficulty: "easy", options: ["銀色", "灰色的", "金色", "白色"] },
-            { word: "green", meaning: "綠色的", difficulty: "easy", options: ["青色的", "綠色的", "黃色的", "藍色的"] },
-            { word: "orange", meaning: "橘色的", difficulty: "easy", options: ["紅色的", "橘色的", "黃色的", "粉色的"] },
-            { word: "pink", meaning: "粉紅色的", difficulty: "easy", options: ["紫色的", "粉紅色的", "紅色的", "桃紅色"] },
-            { word: "purple", meaning: "紫色的", difficulty: "easy", options: ["藍色的", "紫色的", "靛色的", "粉色的"] },
-            { word: "red", meaning: "紅色的", difficulty: "easy", options: ["橘色的", "紅色的", "粉色的", "褐色的"] },
-            { word: "white", meaning: "白色的", difficulty: "easy", options: ["黑色的", "白色的", "灰色的", "透明的"] },
-            { word: "yellow", meaning: "黃色的", difficulty: "easy", options: ["金色的", "黃色的", "綠色的", "米色的"] },
+            // 颜色
+            { word: "black", meaning: "黑色的", category: "color" },
+            { word: "blue", meaning: "藍色的", category: "color" },
+            { word: "brown", meaning: "咖啡色", category: "color" },
+            { word: "color", meaning: "顏色", category: "color" },
+            { word: "gray", meaning: "灰色的", category: "color" },
+            { word: "green", meaning: "綠色的", category: "color" },
+            { word: "orange", meaning: "橘色的", category: "color" },
+            { word: "pink", meaning: "粉紅色的", category: "color" },
+            { word: "purple", meaning: "紫色的", category: "color" },
+            { word: "red", meaning: "紅色的", category: "color" },
+            { word: "white", meaning: "白色的", category: "color" },
+            { word: "yellow", meaning: "黃色的", category: "color" },
 
-            // 家庭 (Family)
-            { word: "aunt", meaning: "阿姨、姑姑", difficulty: "medium", options: ["嬸嬸", "阿姨、姑姑", "舅媽", "伯母"] },
-            { word: "brother", meaning: "哥哥、弟弟", difficulty: "easy", options: ["姐妹", "哥哥、弟弟", "朋友", "同學"] },
-            { word: "cousin", meaning: "堂兄弟姊妹", difficulty: "medium", options: ["鄰居", "堂兄弟姊妹", "玩伴", "師生"] },
-            { word: "dad", meaning: "爸爸", difficulty: "easy", options: ["叔叔", "爸爸", "爺爺", "舅舅"] },
-            { word: "daughter", meaning: "女兒", difficulty: "medium", options: ["兒子", "女兒", "姪女", "孫女"] },
-            { word: "family", meaning: "家庭、家人", difficulty: "easy", options: ["朋友", "家庭、家人", "同事", "鄰居"] },
-            { word: "father", meaning: "爸爸", difficulty: "easy", options: ["母親", "爸爸", "祖父", "兄長"] },
-            { word: "grandfather", meaning: "外公、爺爺", difficulty: "medium", options: ["外公、爺爺", "外婆、奶奶", "伯父", "叔父"] },
-            { word: "grandma", meaning: "外婆、奶奶", difficulty: "medium", options: ["外婆、奶奶", "外公、爺爺", "阿姨", "姑姑"] },
-            { word: "grandmother", meaning: "外婆、奶奶", difficulty: "medium", options: ["外婆、奶奶", "外公、爺爺", "媽媽", "阿姨"] },
-            { word: "grandpa", meaning: "外公、爺爺", difficulty: "medium", options: ["外公、爺爺", "外婆、奶奶", "爸爸", "叔叔"] },
-            { word: "mom", meaning: "媽媽", difficulty: "easy", options: ["阿姨", "媽媽", "姑姑", "姐姐"] },
-            { word: "mother", meaning: "媽媽", difficulty: "easy", options: ["父親", "媽媽", "祖母", "阿姨"] },
-            { word: "parent", meaning: "父母親", difficulty: "medium", options: ["小孩", "父母親", "長輩", "晚輩"] },
-            { word: "sister", meaning: "姐姐、妹妹", difficulty: "easy", options: ["兄弟", "姐姐、妹妹", "朋友", "同學"] },
-            { word: "son", meaning: "兒子", difficulty: "medium", options: ["女兒", "兒子", "侄子", "外甥"] },
-            { word: "uncle", meaning: "叔叔、舅舅", difficulty: "medium", options: ["伯伯", "叔叔、舅舅", "姑丈", "姨丈"] },
+            // 家庭
+            { word: "aunt", meaning: "阿姨、姑姑", category: "family" },
+            { word: "brother", meaning: "哥哥、弟弟", category: "family" },
+            { word: "cousin", meaning: "堂兄弟姊妹", category: "family" },
+            { word: "dad", meaning: "爸爸", category: "family" },
+            { word: "daddy", meaning: "爸爸", category: "family" },
+            { word: "daughter", meaning: "女兒", category: "family" },
+            { word: "family", meaning: "家庭、家人", category: "family" },
+            { word: "father", meaning: "爸爸", category: "family" },
+            { word: "grandfather", meaning: "外公、爺爺", category: "family" },
+            { word: "grandma", meaning: "外婆、奶奶", category: "family" },
+            { word: "grandmother", meaning: "外婆、奶奶", category: "family" },
+            { word: "grandpa", meaning: "外公、爺爺", category: "family" },
+            { word: "mom", meaning: "媽媽", category: "family" },
+            { word: "mommy", meaning: "媽媽", category: "family" },
+            { word: "mother", meaning: "媽媽", category: "family" },
+            { word: "parent", meaning: "父母親", category: "family" },
+            { word: "sister", meaning: "姐姐、妹妹", category: "family" },
+            { word: "son", meaning: "兒子", category: "family" },
+            { word: "uncle", meaning: "叔叔、舅舅", category: "family" },
 
-            // 食物 / 飲料 (Food/Drink)
-            { word: "apple", meaning: "蘋果", difficulty: "easy", options: ["香蕉", "蘋果", "橘子", "葡萄"] },
-            { word: "banana", meaning: "香蕉", difficulty: "easy", options: ["蘋果", "香蕉", "鳳梨", "芒果"] },
-            { word: "beef", meaning: "牛肉", difficulty: "medium", options: ["豬肉", "牛肉", "羊肉", "雞肉"] },
-            { word: "bread", meaning: "麵包", difficulty: "easy", options: ["饅頭", "麵包", "蛋糕", "餅乾"] },
-            { word: "breakfast", meaning: "早餐", difficulty: "medium", options: ["午餐", "晚餐", "早餐", "宵夜"] },
-            { word: "cake", meaning: "蛋糕", difficulty: "easy", options: ["派", "蛋糕", "布丁", "果凍"] },
-            { word: "candy", meaning: "糖果", difficulty: "easy", options: ["巧克力", "糖果", "棒棒糖", "口香糖"] },
-            { word: "chicken", meaning: "雞肉", difficulty: "easy", options: ["鴨肉", "雞肉", "鵝肉", "火雞肉"] },
-            { word: "chocolate", meaning: "巧克力", difficulty: "medium", options: ["可可", "巧克力", "糖果", "甜點"] },
-            { word: "coffee", meaning: "咖啡", difficulty: "medium", options: ["茶", "咖啡", "可可", "果汁"] },
-            { word: "cola", meaning: "可樂", difficulty: "easy", options: ["汽水", "可樂", "雪碧", "沙士"] },
-            { word: "cook", meaning: "做飯", difficulty: "medium", options: ["吃飯", "做飯", "洗碗", "买菜"] },
-            { word: "cookies", meaning: "餅乾", difficulty: "easy", options: ["蛋糕", "餅乾", "派", "塔"] },
-            { word: "dinner", meaning: "晚餐", difficulty: "medium", options: ["早餐", "午餐", "晚餐", "點心"] },
-            { word: "drink", meaning: "喝", difficulty: "easy", options: ["吃", "喝", "吞", "咬"] },
-            { word: "dumpling", meaning: "水餃", difficulty: "medium", options: ["包子", "水餃", "餛飩", "燒賣"] },
-            { word: "eat", meaning: "吃", difficulty: "easy", options: ["喝", "吃", "玩", "睡"] },
-            { word: "egg", meaning: "蛋", difficulty: "easy", options: ["肉", "蛋", "菜", "飯"] },
-            { word: "fish", meaning: "魚肉", difficulty: "easy", options: ["蝦", "魚肉", "蟹", "貝"] },
-            { word: "food", meaning: "食物", difficulty: "easy", options: ["飲料", "食物", "零食", "水果"] },
-            { word: "French fries", meaning: "薯條", difficulty: "medium", options: ["薯片", "薯條", "地瓜條", "洋蔥圈"] },
-            { word: "fruit", meaning: "水果", difficulty: "easy", options: ["蔬菜", "水果", "穀物", "肉類"] },
-            { word: "full", meaning: "飽的", difficulty: "medium", options: ["餓的", "飽的", "渴的", "累的"] },
-            { word: "grape", meaning: "葡萄", difficulty: "easy", options: ["草莓", "葡萄", "櫻桃", "藍莓"] },
-            { word: "hamburger", meaning: "漢堡", difficulty: "medium", options: ["三明治", "漢堡", "熱狗", "吐司"] },
-            { word: "hungry", meaning: "餓的", difficulty: "medium", options: ["飽的", "餓的", "渴的", "胖的"] },
-            { word: "ice cream", meaning: "冰淇淋", difficulty: "medium", options: ["冰棒", "冰淇淋", "雪糕", "冰沙"] },
-            { word: "juice", meaning: "果汁", difficulty: "easy", options: ["牛奶", "果汁", "開水", "茶"] },
-            { word: "lemon", meaning: "檸檬", difficulty: "medium", options: ["萊姆", "檸檬", "柳橙", "柚子"] },
-            { word: "lunch", meaning: "午餐", difficulty: "medium", options: ["早餐", "午餐", "晚餐", "宵夜"] },
-            { word: "meal", meaning: "餐", difficulty: "medium", options: ["菜", "餐", "湯", "飯"] },
-            { word: "milk", meaning: "牛奶", difficulty: "easy", options: ["豆漿", "牛奶", "優格", "起司"] },
-            { word: "noodles", meaning: "麵條", difficulty: "medium", options: ["米粉", "麵條", "冬粉", "義大利麵"] },
-            { word: "orange", meaning: "橘子", difficulty: "easy", options: ["柳橙", "橘子", "檸檬", "葡萄柚"] },
-            { word: "peach", meaning: "桃子", difficulty: "medium", options: ["李子", "桃子", "杏子", "梅子"] },
-            { word: "pie", meaning: "派", difficulty: "medium", options: ["塔", "派", "餅", "糕"] },
-            { word: "pizza", meaning: "披薩", difficulty: "medium", options: ["漢堡", "披薩", "熱狗", "三明治"] },
-            { word: "pork", meaning: "豬肉", difficulty: "medium", options: ["牛肉", "豬肉", "羊肉", "雞肉"] },
-            { word: "pumpkin", meaning: "南瓜", difficulty: "medium", options: ["冬瓜", "南瓜", "絲瓜", "苦瓜"] },
-            { word: "rice", meaning: "米飯", difficulty: "easy", options: ["麵", "米飯", "粥", "麥片"] },
-            { word: "salad", meaning: "沙拉", difficulty: "medium", options: ["涼拌", "沙拉", "泡菜", "醬菜"] },
-            { word: "sandwich", meaning: "三明治", difficulty: "medium", options: ["漢堡", "三明治", "吐司", "捲餅"] },
-            { word: "soup", meaning: "湯", difficulty: "easy", options: ["汁", "湯", "醬", "露"] },
-            { word: "strawberry", meaning: "草莓", difficulty: "medium", options: ["藍莓", "草莓", "覆盆子", "桑葚"] },
-            { word: "sweet", meaning: "甜的", difficulty: "medium", options: ["酸的", "甜的", "苦的", "辣的"] },
-            { word: "taste", meaning: "嚐起來", difficulty: "medium", options: ["聞起來", "嚐起來", "看起來", "聽起來"] },
-            { word: "tea", meaning: "茶", difficulty: "easy", options: ["咖啡", "茶", "可可", "酒"] },
-            { word: "thirsty", meaning: "口渴的", difficulty: "medium", options: ["飢餓的", "口渴的", "睏倦的", "寒冷的"] },
-            { word: "water", meaning: "水", difficulty: "easy", options: ["火", "水", "土", "氣"] },
-            { word: "watermelon", meaning: "西瓜", difficulty: "medium", options: ["哈密瓜", "西瓜", "香瓜", "木瓜"] },
-            { word: "yummy", meaning: "美味的", difficulty: "medium", options: ["難吃的", "美味的", "普通的", "奇怪的"] },
+            // 食物/饮料
+            { word: "apple", meaning: "蘋果", category: "food" },
+            { word: "banana", meaning: "香蕉", category: "food" },
+            { word: "beef", meaning: "牛肉", category: "food" },
+            { word: "bread", meaning: "麵包", category: "food" },
+            { word: "breakfast", meaning: "早餐", category: "food" },
+            { word: "cake", meaning: "蛋糕", category: "food" },
+            { word: "candy", meaning: "糖果", category: "food" },
+            { word: "chicken", meaning: "雞肉", category: "food" },
+            { word: "chocolate", meaning: "巧克力", category: "food" },
+            { word: "coffee", meaning: "咖啡", category: "food" },
+            { word: "cola", meaning: "可樂", category: "food" },
+            { word: "coke", meaning: "可樂", category: "food" },
+            { word: "cook", meaning: "做飯", category: "food" },
+            { word: "cookies", meaning: "餅乾", category: "food" },
+            { word: "dinner", meaning: "晚餐", category: "food" },
+            { word: "drink", meaning: "喝", category: "food" },
+            { word: "dumpling", meaning: "水餃", category: "food" },
+            { word: "eat", meaning: "吃", category: "food" },
+            { word: "egg", meaning: "蛋", category: "food" },
+            { word: "fish", meaning: "魚肉", category: "food" },
+            { word: "food", meaning: "食物", category: "food" },
+            { word: "French fries", meaning: "薯條", category: "food" },
+            { word: "fruit", meaning: "水果", category: "food" },
+            { word: "full", meaning: "飽的", category: "food" },
+            { word: "grape", meaning: "葡萄", category: "food" },
+            { word: "hamburger", meaning: "漢堡", category: "food" },
+            { word: "hungry", meaning: "餓的", category: "food" },
+            { word: "ice cream", meaning: "冰淇淋", category: "food" },
+            { word: "juice", meaning: "果汁", category: "food" },
+            { word: "lemon", meaning: "檸檬", category: "food" },
+            { word: "lunch", meaning: "午餐", category: "food" },
+            { word: "meal", meaning: "餐", category: "food" },
+            { word: "milk", meaning: "牛奶", category: "food" },
+            { word: "noodles", meaning: "麵條", category: "food" },
+            { word: "orange", meaning: "橘子", category: "food" },
+            { word: "peach", meaning: "桃子", category: "food" },
+            { word: "pie", meaning: "派", category: "food" },
+            { word: "pizza", meaning: "披薩", category: "food" },
+            { word: "pork", meaning: "豬肉", category: "food" },
+            { word: "pumpkin", meaning: "南瓜", category: "food" },
+            { word: "rice", meaning: "米飯", category: "food" },
+            { word: "salad", meaning: "沙拉", category: "food" },
+            { word: "sandwich", meaning: "三明治", category: "food" },
+            { word: "soup", meaning: "湯", category: "food" },
+            { word: "strawberry", meaning: "草莓", category: "food" },
+            { word: "sweet", meaning: "甜的", category: "food" },
+            { word: "taste", meaning: "嚐起來", category: "food" },
+            { word: "tea", meaning: "茶", category: "food" },
+            { word: "thirsty", meaning: "口渴的", category: "food" },
+            { word: "water", meaning: "水", category: "food" },
+            { word: "watermelon", meaning: "西瓜", category: "food" },
+            { word: "yummy", meaning: "美味的", category: "food" },
 
-            // 房子 / 居家 (House/Home)
-            { word: "bathroom", meaning: "浴室", difficulty: "medium", options: ["廁所", "浴室", "廚房", "臥室"] },
-            { word: "bed", meaning: "床", difficulty: "easy", options: ["桌子", "床", "椅子", "櫃子"] },
-            { word: "bedroom", meaning: "臥房", difficulty: "medium", options: ["客廳", "臥房", "書房", "餐廳"] },
-            { word: "chair", meaning: "椅子", difficulty: "easy", options: ["桌子", "椅子", "沙發", "凳子"] },
-            { word: "clean", meaning: "乾淨的 / 清理", difficulty: "medium", options: ["髒的", "乾淨的 / 清理", "亂的", "舊的"] },
-            { word: "computer", meaning: "電腦", difficulty: "medium", options: ["電視", "電腦", "手機", "平板"] },
-            { word: "desk", meaning: "桌子", difficulty: "easy", options: ["椅子", "桌子", "床", "窗"] },
-            { word: "dining room", meaning: "餐廳（家裡）", difficulty: "medium", options: ["廚房", "餐廳（家裡）", "客廳", "陽台"] },
-            { word: "door", meaning: "門", difficulty: "easy", options: ["窗", "門", "牆", "地"] },
-            { word: "fan", meaning: "電扇", difficulty: "medium", options: ["燈", "電扇", "冷氣", "暖氣"] },
-            { word: "floor", meaning: "地板", difficulty: "medium", options: ["天花板", "地板", "牆壁", "屋頂"] },
-            { word: "fridge", meaning: "電冰箱", difficulty: "medium", options: ["烤箱", "電冰箱", "微波爐", "洗碗機"] },
-            { word: "garden", meaning: "院子、花園", difficulty: "medium", options: ["公園", "院子、花園", "農場", "森林"] },
-            { word: "home", meaning: "家庭", difficulty: "easy", options: ["房子", "家庭", "社區", "城市"] },
-            { word: "house", meaning: "房子", difficulty: "easy", options: ["公寓", "房子", "別墅", "大廈"] },
-            { word: "key", meaning: "鑰匙", difficulty: "medium", options: ["鎖", "鑰匙", "門把", "門鈴"] },
-            { word: "kitchen", meaning: "廚房", difficulty: "medium", options: ["浴室", "廚房", "臥室", "客廳"] },
-            { word: "lamp", meaning: "燈", difficulty: "easy", options: ["燭台", "燈", "手電筒", "火把"] },
-            { word: "living room", meaning: "客廳", difficulty: "medium", options: ["餐廳", "客廳", "書房", "玄關"] },
-            { word: "mop", meaning: "用拖把拖地", difficulty: "hard", options: ["掃地", "用拖把拖地", "擦窗戶", "倒垃圾"] },
-            { word: "refrigerator", meaning: "電冰箱", difficulty: "hard", options: ["洗衣機", "電冰箱", "吸塵器", "烘碗機"] },
-            { word: "shelf", meaning: "架子", difficulty: "medium", options: ["櫃子", "架子", "抽屜", "箱子"] },
-            { word: "shower", meaning: "淋浴", difficulty: "medium", options: ["泡澡", "淋浴", "洗手", "洗臉"] },
-            { word: "sofa", meaning: "沙發", difficulty: "medium", options: ["椅子", "沙發", "長凳", "躺椅"] },
-            { word: "street", meaning: "街道", difficulty: "medium", options: ["马路", "街道", "巷子", "高速公路"] },
-            { word: "sweep", meaning: "掃", difficulty: "medium", options: ["拖", "掃", "擦", "洗"] },
-            { word: "table", meaning: "桌子", difficulty: "easy", options: ["椅子", "桌子", "板凳", "茶几"] },
-            { word: "telephone", meaning: "電話", difficulty: "medium", options: ["手機", "電話", "對講機", "傳真機"] },
-            { word: "television", meaning: "電視", difficulty: "medium", options: ["收音機", "電視", "投影機", "電腦"] },
-            { word: "towel", meaning: "毛巾", difficulty: "medium", options: ["衛生紙", "毛巾", "浴巾", "手帕"] },
-            { word: "wall", meaning: "牆壁", difficulty: "medium", options: ["地板", "牆壁", "天花板", "屋頂"] },
-            { word: "wash", meaning: "洗", difficulty: "easy", options: ["擦", "洗", "刷", "沖"] },
-            { word: "window", meaning: "窗戶", difficulty: "easy", options: ["門", "窗戶", "牆", "地"] },
+            // 房子/居家
+            { word: "bathroom", meaning: "浴室", category: "house" },
+            { word: "bed", meaning: "床", category: "house" },
+            { word: "bedroom", meaning: "臥房", category: "house" },
+            { word: "chair", meaning: "椅子", category: "house" },
+            { word: "clean", meaning: "乾淨的 / 清理", category: "house" },
+            { word: "computer", meaning: "電腦", category: "house" },
+            { word: "desk", meaning: "桌子", category: "house" },
+            { word: "dining room", meaning: "餐廳", category: "house" },
+            { word: "door", meaning: "門", category: "house" },
+            { word: "fan", meaning: "電扇", category: "house" },
+            { word: "floor", meaning: "地板", category: "house" },
+            { word: "fridge", meaning: "電冰箱", category: "house" },
+            { word: "garden", meaning: "院子、花園", category: "house" },
+            { word: "home", meaning: "家庭", category: "house" },
+            { word: "house", meaning: "房子", category: "house" },
+            { word: "key", meaning: "鑰匙", category: "house" },
+            { word: "kitchen", meaning: "廚房", category: "house" },
+            { word: "lamp", meaning: "燈", category: "house" },
+            { word: "living room", meaning: "客廳", category: "house" },
+            { word: "mop", meaning: "用拖把拖地", category: "house" },
+            { word: "refrigerator", meaning: "電冰箱", category: "house" },
+            { word: "shelf", meaning: "架子", category: "house" },
+            { word: "shower", meaning: "淋浴", category: "house" },
+            { word: "sofa", meaning: "沙發", category: "house" },
+            { word: "street", meaning: "街道", category: "house" },
+            { word: "sweep", meaning: "掃", category: "house" },
+            { word: "table", meaning: "桌子", category: "house" },
+            { word: "telephone", meaning: "電話", category: "house" },
+            { word: "television", meaning: "電視", category: "house" },
+            { word: "TV", meaning: "電視", category: "house" },
+            { word: "towel", meaning: "毛巾", category: "house" },
+            { word: "wall", meaning: "牆壁", category: "house" },
+            { word: "wash", meaning: "洗", category: "house" },
+            { word: "window", meaning: "窗戶", category: "house" },
 
-            // 數字 / 金額 (Numbers/Money)
-            { word: "all", meaning: "全部", difficulty: "medium", options: ["部分", "全部", "一些", "沒有"] },
-            { word: "both", meaning: "兩者都", difficulty: "medium", options: ["單一", "兩者都", "多個", "全體"] },
-            { word: "eight", meaning: "八", difficulty: "easy", options: ["七", "八", "九", "十"] },
-            { word: "eighteen", meaning: "十八", difficulty: "medium", options: ["八十", "十八", "八", "八十"] },
-            { word: "eighty", meaning: "八十", difficulty: "medium", options: ["十八", "八十", "八", "八百"] },
-            { word: "eleven", meaning: "十一", difficulty: "medium", options: ["十二", "十一", "十", "二十"] },
-            { word: "fifteen", meaning: "十五", difficulty: "medium", options: ["五十", "十五", "五", "二十五"] },
-            { word: "fifty", meaning: "五十", difficulty: "medium", options: ["十五", "五十", "五", "五百"] },
-            { word: "first", meaning: "第一", difficulty: "medium", options: ["第二", "第一", "第三", "最後"] },
-            { word: "five", meaning: "五", difficulty: "easy", options: ["四", "五", "六", "七"] },
-            { word: "forty", meaning: "四十", difficulty: "medium", options: ["十四", "四十", "四", "四百"] },
-            { word: "four", meaning: "四", difficulty: "easy", options: ["三", "四", "五", "六"] },
-            { word: "fourteen", meaning: "十四", difficulty: "medium", options: ["四十", "十四", "四", "四十四"] },
-            { word: "hundred", meaning: "百", difficulty: "medium", options: ["千", "百", "十", "萬"] },
-            { word: "last", meaning: "最後的", difficulty: "medium", options: ["最初的", "最後的", "中間的", "當前的"] },
-            { word: "many", meaning: "許多", difficulty: "medium", options: ["很少", "許多", "一些", "單獨"] },
-            { word: "more", meaning: "更多", difficulty: "medium", options: ["更少", "更多", "相同", "足夠"] },
-            { word: "much", meaning: "多", difficulty: "medium", options: ["少", "多", "空", "滿"] },
-            { word: "nine", meaning: "九", difficulty: "easy", options: ["八", "九", "十", "十一"] },
-            { word: "nineteen", meaning: "十九", difficulty: "medium", options: ["九十", "十九", "九", "二十九"] },
-            { word: "ninety", meaning: "九十", difficulty: "medium", options: ["十九", "九十", "九", "九百"] },
-            { word: "number", meaning: "數字", difficulty: "easy", options: ["字母", "數字", "符號", "文字"] },
-            { word: "one", meaning: "一", difficulty: "easy", options: ["零", "一", "二", "三"] },
-            { word: "second", meaning: "第二", difficulty: "medium", options: ["第一", "第二", "第三", "第四"] },
-            { word: "seven", meaning: "七", difficulty: "easy", options: ["六", "七", "八", "九"] },
-            { word: "seventeen", meaning: "十七", difficulty: "medium", options: ["七十", "十七", "七", "二十七"] },
-            { word: "seventy", meaning: "七十", difficulty: "medium", options: ["十七", "七十", "七", "七百"] },
-            { word: "six", meaning: "六", difficulty: "easy", options: ["五", "六", "七", "八"] },
-            { word: "sixteen", meaning: "十六", difficulty: "medium", options: ["六十", "十六", "六", "二十六"] },
-            { word: "sixty", meaning: "六十", difficulty: "medium", options: ["十六", "六十", "六", "六百"] },
-            { word: "some", meaning: "一些", difficulty: "medium", options: ["全部", "一些", "沒有", "很多"] },
-            { word: "ten", meaning: "十", difficulty: "easy", options: ["九", "十", "十一", "十二"] },
-            { word: "third", meaning: "第三", difficulty: "medium", options: ["第二", "第三", "第四", "第五"] },
-            { word: "thirteen", meaning: "十三", difficulty: "medium", options: ["三十", "十三", "三", "二十三"] },
-            { word: "thirty", meaning: "三十", difficulty: "medium", options: ["十三", "三十", "三", "三百"] },
-            { word: "three", meaning: "三", difficulty: "easy", options: ["二", "三", "四", "五"] },
-            { word: "twelve", meaning: "十二", difficulty: "medium", options: ["二十", "十二", "二", "二十二"] },
-            { word: "twenty", meaning: "二十", difficulty: "medium", options: ["十二", "二十", "二", "二百"] },
-            { word: "zero", meaning: "零", difficulty: "easy", options: ["一", "零", "十", "百"] },
-            { word: "buy", meaning: "買", difficulty: "medium", options: ["賣", "買", "租", "借"] },
-            { word: "dollar", meaning: "元", difficulty: "medium", options: ["角", "元", "分", "幣"] },
-            { word: "free", meaning: "免費的", difficulty: "medium", options: ["付費的", "免費的", "昂貴的", "便宜的"] },
-            { word: "money", meaning: "錢", difficulty: "easy", options: ["紙", "錢", "卡", "票"] },
-
-            // 形容詞 (Adjectives)
-            { word: "cool", meaning: "清涼的", difficulty: "medium", options: ["溫暖的", "清涼的", "炎熱的", "寒冷的"] },
-            { word: "different", meaning: "不一樣的", difficulty: "medium", options: ["相同的", "不一樣的", "類似的", "普通的"] },
-            { word: "dirty", meaning: "髒的", difficulty: "medium", options: ["乾淨的", "髒的", "整潔的", "明亮的"] },
-            { word: "easy", meaning: "簡單的", difficulty: "medium", options: ["困難的", "簡單的", "複雜的", "麻煩的"] },
-            { word: "favorite", meaning: "最喜歡的", difficulty: "medium", options: ["討厭的", "最喜歡的", "普通的", "陌生的"] },
-            { word: "fine", meaning: "很不錯的", difficulty: "medium", options: ["糟糕的", "很不錯的", "普通的", "壞的"] },
-            { word: "fun", meaning: "有趣的", difficulty: "medium", options: ["無聊的", "有趣的", "嚴肅的", "悲傷的"] },
-            { word: "great", meaning: "很棒的", difficulty: "medium", options: ["差勁的", "很棒的", "普通的", "一般的"] },
-            { word: "hard", meaning: "困難的", difficulty: "medium", options: ["容易的", "困難的", "柔軟的", "輕鬆的"] },
-            { word: "hot", meaning: "熱的", difficulty: "easy", options: ["冷的", "熱的", "溫的", "涼的"] },
-            { word: "interested", meaning: "有趣的", difficulty: "medium", options: ["無趣的", "有趣的", "冷漠的", "厭煩的"] },
-            { word: "new", meaning: "新的", difficulty: "easy", options: ["舊的", "新的", "老的", "破的"] },
-            { word: "OK", meaning: "好的", difficulty: "easy", options: ["不好", "好的", "也許", "拒絕"] },
-            { word: "quiet", meaning: "安靜的", difficulty: "medium", options: ["吵鬧的", "安靜的", "大聲的", "喧嘩的"] },
-            { word: "ready", meaning: "準備好的", difficulty: "medium", options: ["未準備", "準備好的", "遲到的", "缺席的"] },
-            { word: "right", meaning: "對的", difficulty: "medium", options: ["錯的", "對的", "左邊的", "壞的"] },
-            { word: "sorry", meaning: "感到抱歉的", difficulty: "medium", options: ["高興的", "感到抱歉的", "生氣的", "興奮的"] },
-            { word: "sure", meaning: "確定的", difficulty: "medium", options: ["懷疑的", "確定的", "猶豫的", "未知的"] },
-            { word: "wet", meaning: "濕的", difficulty: "medium", options: ["乾的", "濕的", "潮濕的", "乾燥的"] },
-            { word: "wonderful", meaning: "很棒的", difficulty: "medium", options: ["糟糕的", "很棒的", "普通的", "平凡的"] },
-
-            // 副詞 (Adverbs)
-            { word: "again", meaning: "再一次", difficulty: "medium", options: ["第一次", "再一次", "最後一次", "從不"] },
-            { word: "always", meaning: "總是、永遠", difficulty: "medium", options: ["有時", "總是、永遠", "從不", "偶爾"] },
-            { word: "maybe", meaning: "也許", difficulty: "medium", options: ["一定", "也許", "絕對", "不可能"] },
-            { word: "never", meaning: "不曾", difficulty: "medium", options: ["經常", "不曾", "總是", "有時"] },
-            { word: "OK", meaning: "沒事", difficulty: "easy", options: ["有事", "沒事", "糟糕", "危險"] },
-            { word: "sometimes", meaning: "有時候", difficulty: "medium", options: ["總是", "有時候", "從不", "經常"] },
-            { word: "sure", meaning: "當然", difficulty: "medium", options: ["也許", "當然", "可能", "懷疑"] },
-            { word: "together", meaning: "一起", difficulty: "medium", options: ["分開", "一起", "單獨", "各自"] },
-            { word: "usually", meaning: "通常", difficulty: "medium", options: ["偶爾", "通常", "從不", "罕見"] },
-
-            // 其他名詞 (Other Nouns)
-            { word: "bottle", meaning: "瓶子", difficulty: "medium", options: ["杯子", "瓶子", "罐子", "盒子"] },
-            { word: "box", meaning: "箱子", difficulty: "easy", options: ["袋子", "箱子", "包裹", "籃子"] },
-            { word: "can", meaning: "罐子", difficulty: "medium", options: ["瓶", "罐子", "桶", "壺"] },
-            { word: "cellphone", meaning: "手機", difficulty: "medium", options: ["電話", "手機", "電腦", "平板"] },
-            { word: "dream", meaning: "夢", difficulty: "medium", options: ["現實", "夢", "幻想", "記憶"] },
-            { word: "e-mail", meaning: "電子郵件", difficulty: "medium", options: ["信件", "電子郵件", "簡訊", "傳真"] },
-            { word: "flower", meaning: "花", difficulty: "easy", options: ["草", "花", "樹", "葉"] },
-            { word: "fun", meaning: "樂趣", difficulty: "medium", options: ["工作", "樂趣", "任務", "責任"] },
-            { word: "gift", meaning: "禮物", difficulty: "medium", options: ["商品", "禮物", "廢品", "物品"] },
-            { word: "mail", meaning: "信", difficulty: "medium", options: ["包裹", "信", "報紙", "雜誌"] },
-            { word: "party", meaning: "派對", difficulty: "medium", options: ["會議", "派對", "課程", "考試"] },
-            { word: "photo", meaning: "照片", difficulty: "medium", options: ["畫作", "照片", "影片", "錄影"] },
-            { word: "robot", meaning: "機器人", difficulty: "medium", options: ["人類", "機器人", "動物", "植物"] },
-            { word: "sale", meaning: "拍賣、特價", difficulty: "hard", options: ["購買", "拍賣、特價", "展示", "收藏"] },
-            { word: "thing", meaning: "東西", difficulty: "easy", options: ["人", "東西", "地方", "時間"] },
-            { word: "ticket", meaning: "票", difficulty: "medium", options: ["證", "票", "卡", "單"] },
-            { word: "birthday", meaning: "生日", difficulty: "medium", options: ["節日", "生日", "紀念日", "假日"] }
+            // 数字/金额
+            { word: "all", meaning: "全部", category: "number" },
+            { word: "both", meaning: "兩者都", category: "number" },
+            { word: "eight", meaning: "八", category: "number" },
+            { word: "eighteen", meaning: "十八", category: "number" },
+            { word: "eighty", meaning: "八十", category: "number" },
+            { word: "eleven", meaning: "十一", category: "number" },
+            { word: "fifteen", meaning: "十五", category: "number" },
+            { word: "fifty", meaning: "五十", category: "number" },
+            { word: "first", meaning: "第一", category: "number" },
+            { word: "five", meaning: "五", category: "number" },
+            { word: "forty", meaning: "四十", category: "number" },
+            { word: "four", meaning: "四", category: "number" },
+            { word: "fourteen", meaning: "十四", category: "number" },
+            { word: "nine", meaning: "九", category: "number" },
+            { word: "nineteen", meaning: "十九", category: "number" },
+            { word: "ninety", meaning: "九十", category: "number" },
+            { word: "one", meaning: "一", category: "number" },
+            { word: "second", meaning: "第二", category: "number" },
+            { word: "seven", meaning: "七", category: "number" },
+            { word: "seventeen", meaning: "十七", category: "number" },
+            { word: "seventy", meaning: "七十", category: "number" },
+            { word: "six", meaning: "六", category: "number" },
+            { word: "sixteen", meaning: "十六", category: "number" },
+            { word: "sixty", meaning: "六十", category: "number" },
+            { word: "ten", meaning: "十", category: "number" },
+            { word: "third", meaning: "第三", category: "number" },
+            { word: "thirteen", meaning: "十三", category: "number" },
+            { word: "thirty", meaning: "三十", category: "number" },
+            { word: "three", meaning: "三", category: "number" },
+            { word: "twelve", meaning: "十二", category: "number" },
+            { word: "twenty", meaning: "二十", category: "number" },
+            { word: "two", meaning: "二", category: "number" }
         ];
 
-        // --- 應用程式邏輯 ---
+        // ==========================================
+        // 第二部分：应用逻辑层 (Application Logic)
+        // 负责状态管理、持久化存储和交互控制
+        // ==========================================
         const app = {
-            currentQuestions: [],
-            currentIndex: 0,
-            score: 0,
-            wrongAnswers: [], // 儲存答錯的題目用於複習
-            isAnswering: false,
-
-            // 初始化
-            init: function() {
-                this.resetApp();
+            state: {
+                currentQuestions: [],
+                currentIndex: 0,
+                score: 0,
+                wrongAnswers: [],
+                isReviewMode: false,
+                quizId: null // 用于 localStorage 恢复进度
             },
 
-            // 重置應用狀態
-            resetApp: function() {
-                document.getElementById('start-screen').classList.remove('hidden');
-                document.getElementById('quiz-screen').classList.add('hidden');
-                document.getElementById('result-screen').classList.add('hidden');
-                document.getElementById('review-section').classList.add('hidden');
-                this.score = 0;
-                this.wrongAnswers = [];
-                this.currentIndex = 0;
+            init() {
+                this.checkSavedProgress();
             },
 
-            // 開始測驗
-            startQuiz: function(difficulty) {
-                let filtered = [];
-                
-                if (difficulty === 'mixed') {
-                    // 綜合模式：複製整個題庫，隨機排序，取前50題（若題庫不足則取全部）
-                    filtered = [...questionBank].sort(() => 0.5 - Math.random());
-                    // 如果題庫超過50題，截取50題；若不足則全部使用
-                    if (filtered.length > 50) {
-                        filtered = filtered.slice(0, 50);
-                    }
+            // 工具函数：洗牌算法
+            shuffle(array) {
+                return array.sort(() => Math.random() - 0.5);
+            },
+
+            // 工具函数：生成唯一ID
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            },
+
+            // 核心功能：开始测验
+            startQuiz(category) {
+                let pool = [];
+                if (category === 'mixed') {
+                    pool = [...QUESTION_BANK];
                 } else {
-                    // 分類模式
-                    filtered = questionBank.filter(q => q.difficulty === difficulty);
-                    // 如果題目太少，混合其他難度補充
-                    if (filtered.length < 5) {
-                        filtered = filtered.concat(questionBank.filter(q => q.difficulty !== difficulty));
-                    }
-                    // 洗牌算法並取10題
-                    filtered = filtered.sort(() => 0.5 - Math.random()).slice(0, 10);
+                    pool = QUESTION_BANK.filter(q => q.category === category);
                 }
+
+                // 随机抽取题目，如果是混合模式则最多50题，其他模式全量或限制数量
+                let selected = this.shuffle([...pool]);
+                if (category === 'mixed') {
+                    selected = selected.slice(0, 50);
+                } else if (selected.length > 20) {
+                    selected = selected.slice(0, 20); // 分类测验限制20题以免太长
+                }
+
+                this.state.currentQuestions = selected.map(q => ({
+                    ...q,
+                    id: this.generateId(),
+                    options: this.generateOptions(q)
+                }));
                 
-                this.currentQuestions = filtered;
-                this.currentIndex = 0;
-                this.score = 0;
-                this.wrongAnswers = [];
-                
-                // 切換畫面
-                document.getElementById('start-screen').classList.add('hidden');
-                document.getElementById('quiz-screen').classList.remove('hidden');
-                document.getElementById('result-screen').classList.add('hidden');
-                
-                this.renderQuestion();
+                this.state.currentIndex = 0;
+                this.state.score = 0;
+                this.state.wrongAnswers = [];
+                this.state.isReviewMode = false;
+                this.state.quizId = this.generateId();
+
+                this.saveProgress();
+                this.renderQuizScreen();
             },
 
-            // 渲染當前題目
-            renderQuestion: function() {
-                const q = this.currentQuestions[this.currentIndex];
-                this.isAnswering = true;
+            // 生成干扰选项
+            generateOptions(correctItem) {
+                const others = QUESTION_BANK.filter(q => q.word !== correctItem.word);
+                const shuffledOthers = this.shuffle(others).slice(0, 3);
+                const options = [...shuffledOthers, correctItem];
+                return this.shuffle(options);
+            },
 
-                // 更新進度
-                document.getElementById('current-q-num').textContent = this.currentIndex + 1;
-                document.getElementById('total-q-num').textContent = this.currentQuestions.length;
-                const progressPercent = ((this.currentIndex) / this.currentQuestions.length) * 100;
-                document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+            // 渲染测验界面
+            renderQuizScreen() {
+                document.getElementById('start-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
 
-                // 更新題目內容
+                this.updateProgressBar();
+                this.loadQuestion();
+            },
+
+            // 加载当前题目
+            loadQuestion() {
+                const q = this.state.currentQuestions[this.state.currentIndex];
                 document.getElementById('question-word').textContent = q.word;
+                document.getElementById('current-q-num').textContent = this.state.currentIndex + 1;
+                document.getElementById('total-q-num').textContent = this.state.currentQuestions.length;
                 
-                // 清空並生成選項
-                const optionsContainer = document.getElementById('options-container');
-                optionsContainer.innerHTML = '';
+                const container = document.getElementById('options-container');
+                container.innerHTML = '';
                 
-                // 打亂選項順序
-                const shuffledOptions = [...q.options].sort(() => 0.5 - Math.random());
-
-                shuffledOptions.forEach(opt => {
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn w-full bg-white border-2 border-gray-200 text-gray-700 font-bold py-4 px-6 rounded-xl text-lg hover:border-blue-400 hover:text-blue-600 shadow-sm';
-                    btn.textContent = opt;
-                    btn.onclick = () => this.checkAnswer(btn, opt, q.meaning);
-                    optionsContainer.appendChild(btn);
-                });
-
-                // 隱藏反饋和下一題按鈕
                 document.getElementById('feedback-msg').classList.add('hidden');
                 document.getElementById('next-btn').classList.add('hidden');
+
+                q.options.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn w-full bg-white border-2 border-gray-200 rounded-xl p-4 text-lg font-semibold text-gray-700 hover:border-blue-300 hover:bg-blue-50';
+                    btn.textContent = opt.meaning;
+                    btn.onclick = () => this.handleAnswer(btn, opt, q);
+                    container.appendChild(btn);
+                });
+
+                this.saveProgress();
             },
 
-            // 檢查答案
-            checkAnswer: function(btnElement, selectedMeaning, correctMeaning) {
-                if (!this.isAnswering) return;
-                this.isAnswering = false;
+            // 处理答题
+            handleAnswer(btn, selectedOpt, correctQ) {
+                // 禁用所有按钮
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(b => b.disabled = true);
 
-                const isCorrect = selectedMeaning === correctMeaning;
-                const allBtns = document.querySelectorAll('.option-btn');
-                const feedbackEl = document.getElementById('feedback-msg');
-
-                // 鎖定所有按鈕
-                allBtns.forEach(btn => btn.disabled = true);
+                const isCorrect = selectedOpt.word === correctQ.word;
+                const feedback = document.getElementById('feedback-msg');
+                feedback.classList.remove('hidden');
 
                 if (isCorrect) {
-                    this.score++;
-                    btnElement.classList.add('correct');
-                    feedbackEl.textContent = "🎉 答對了！好棒！";
-                    feedbackEl.className = "text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-green-100 text-green-700 block";
+                    btn.classList.add('correct');
+                    this.state.score++;
+                    feedback.textContent = '🎉 答對了！好棒！';
+                    feedback.className = 'text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-green-100 text-green-700';
                 } else {
-                    btnElement.classList.add('wrong');
-                    // 找出正確答案並標記
-                    allBtns.forEach(btn => {
-                        if (btn.textContent === correctMeaning) {
-                            btn.classList.add('correct');
-                        }
+                    btn.classList.add('wrong');
+                    // 高亮正确答案
+                    buttons.forEach(b => {
+                        if (b.textContent === correctQ.meaning) b.classList.add('correct');
                     });
-                    feedbackEl.textContent = `😅 答錯了，正確答案是：${correctMeaning}`;
-                    feedbackEl.className = "text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-red-100 text-red-700 block";
-                    
-                    // 加入複習清單 (避免重複加入同一題，雖然邏輯上不會發生，但保險起見)
-                    if (!this.wrongAnswers.includes(this.currentQuestions[this.currentIndex])) {
-                        this.wrongAnswers.push(this.currentQuestions[this.currentIndex]);
-                    }
+                    this.state.wrongAnswers.push(correctQ);
+                    feedback.textContent = `😅 答錯了，正確答案是：${correctQ.meaning}`;
+                    feedback.className = 'text-center p-4 rounded-xl font-bold text-lg animate-bounce-in bg-red-100 text-red-700';
                 }
 
-                feedbackEl.classList.remove('hidden');
                 document.getElementById('next-btn').classList.remove('hidden');
+                this.saveProgress();
             },
 
-            // 下一題
-            nextQuestion: function() {
-                this.currentIndex++;
-                if (this.currentIndex < this.currentQuestions.length) {
-                    this.renderQuestion();
+            // 下一题
+            nextQuestion() {
+                this.state.currentIndex++;
+                if (this.state.currentIndex < this.state.currentQuestions.length) {
+                    this.loadQuestion();
                 } else {
-                    this.showResult();
+                    this.finishQuiz();
                 }
             },
 
-            // 顯示結果
-            showResult: function() {
+            // 更新进度条
+            updateProgressBar() {
+                const percent = ((this.state.currentIndex) / this.state.currentQuestions.length) * 100;
+                document.getElementById('progress-bar').style.width = `${percent}%`;
+            },
+
+            // 结束测验
+            finishQuiz() {
                 document.getElementById('quiz-screen').classList.add('hidden');
                 document.getElementById('result-screen').classList.remove('hidden');
                 
-                document.getElementById('final-score').textContent = this.score;
-                document.getElementById('final-total').textContent = this.currentQuestions.length;
+                document.getElementById('final-score').textContent = this.state.score;
+                document.getElementById('final-total').textContent = this.state.currentQuestions.length;
                 
-                // 根據分數給予評語
-                const percentage = (this.score / this.currentQuestions.length) * 100;
-                const commentEl = document.getElementById('score-comment');
-                if (percentage === 100) {
-                    commentEl.textContent = "太厲害了！你是英文小天才！🌟";
-                    this.triggerConfetti();
-                } else if (percentage >= 80) {
-                    commentEl.textContent = "表現很棒！繼續保持！💪";
-                } else if (percentage >= 60) {
-                    commentEl.textContent = "不錯喔！再加油一點點！📚";
-                } else {
-                    commentEl.textContent = "別灰心，多看幾次就記住囉！❤️";
-                }
+                const percentage = (this.state.score / this.state.currentQuestions.length) * 100;
+                const comment = document.getElementById('score-comment');
+                if (percentage === 100) comment.textContent = "太厲害了！滿分！🌟";
+                else if (percentage >= 80) comment.textContent = "做得很好！繼續保持！👍";
+                else if (percentage >= 60) comment.textContent = "不錯喔！再加油一點！💪";
+                else comment.textContent = "別灰心，多練習幾次就會了！📚";
 
-                // 如果有錯題，顯示複習按鈕提示
+                // 显示/隐藏复习按钮
                 const reviewBtn = document.getElementById('review-btn');
-                if (this.wrongAnswers.length > 0) {
+                if (this.state.wrongAnswers.length > 0) {
                     reviewBtn.classList.remove('hidden');
-                    reviewBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> 錯題複習 (${this.wrongAnswers.length})`;
+                    reviewBtn.innerHTML = `<i class="fa-solid fa-book-open"></i> 錯題複習 (${this.state.wrongAnswers.length})`;
                 } else {
                     reviewBtn.classList.add('hidden');
                 }
+                
+                document.getElementById('review-section').classList.add('hidden');
+                
+                // 清除已完成的进度保存
+                localStorage.removeItem('englishQuizProgress');
             },
 
-            // 顯示複習區
-            showReview: function() {
-                const reviewSection = document.getElementById('review-section');
-                const reviewList = document.getElementById('review-list');
-                
-                reviewSection.classList.remove('hidden');
-                reviewList.innerHTML = '';
+            // 显示错题复习
+            showReview() {
+                const section = document.getElementById('review-section');
+                section.classList.remove('hidden');
+                const list = document.getElementById('review-list');
+                list.innerHTML = '';
 
-                if (this.wrongAnswers.length === 0) {
-                    reviewList.innerHTML = '<p class="text-center text-gray-500 py-4">太棒了！這次沒有錯題需要複習。</p>';
-                    return;
-                }
-
-                this.wrongAnswers.forEach(item => {
+                this.state.wrongAnswers.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = 'bg-orange-50 border border-orange-200 p-4 rounded-xl flex justify-between items-center cursor-pointer hover:bg-orange-100 transition';
-                    div.onclick = () => this.speakText(item.word);
+                    div.className = 'bg-orange-50 border border-orange-200 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:bg-orange-100 transition';
                     div.innerHTML = `
                         <div>
                             <span class="font-bold text-orange-800 text-lg">${item.word}</span>
-                            <span class="text-gray-500 mx-2">-</span>
-                            <span class="text-gray-700">${item.meaning}</span>
+                            <span class="text-gray-600 ml-2">${item.meaning}</span>
                         </div>
                         <i class="fa-solid fa-volume-high text-orange-400"></i>
                     `;
-                    reviewList.appendChild(div);
+                    div.onclick = () => this.speakText(item.word);
+                    list.appendChild(div);
                 });
                 
-                // 滾動到複習區
-                reviewSection.scrollIntoView({ behavior: 'smooth' });
+                // 滚动到底部
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
             },
 
-            // 語音朗讀 (使用瀏覽器內建 API)
-            speakWord: function() {
+            // 语音播放
+            speakWord() {
                 const word = document.getElementById('question-word').textContent;
                 this.speakText(word);
             },
 
-            speakText: function(text) {
+            speakText(text) {
                 if ('speechSynthesis' in window) {
-                    // 取消之前的發音，避免堆疊
-                    window.speechSynthesis.cancel();
                     const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.lang = 'en-US'; // 設定為美式英語
-                    utterance.rate = 0.8; // 語速稍慢，適合小學生
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8; // 稍微慢一点适合小学生
                     window.speechSynthesis.speak(utterance);
                 } else {
-                    alert("您的瀏覽器不支援語音功能");
+                    alert("您的瀏覽器不支持語音功能");
                 }
             },
 
-            // 簡單的紙花特效
-            triggerConfetti: function() {
-                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
-                for (let i = 0; i < 50; i++) {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.left = Math.random() * 100 + 'vw';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    document.body.appendChild(confetti);
-                    
-                    // 動畫結束後移除元素
-                    setTimeout(() => confetti.remove(), 4000);
+            // 本地存储：保存进度
+            saveProgress() {
+                const data = {
+                    timestamp: Date.now(),
+                    state: this.state
+                };
+                localStorage.setItem('englishQuizProgress', JSON.stringify(data));
+            },
+
+            // 本地存储：检查并恢复进度
+            checkSavedProgress() {
+                const saved = localStorage.getItem('englishQuizProgress');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        // 如果保存时间在24小时内，且测验未完成（currentIndex < total）
+                        if (Date.now() - data.timestamp < 24 * 60 * 60 * 1000) {
+                            const s = data.state;
+                            if (s.currentQuestions && s.currentIndex < s.currentQuestions.length) {
+                                if (confirm("檢測到您上次有未完成的測驗，是否繼續？")) {
+                                    this.state = s;
+                                    this.renderQuizScreen();
+                                    return;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error("恢復進度失敗", e);
+                    }
                 }
+            },
+
+            // 重置应用
+            resetApp() {
+                localStorage.removeItem('englishQuizProgress');
+                document.getElementById('quiz-screen').classList.add('hidden');
+                document.getElementById('result-screen').classList.add('hidden');
+                document.getElementById('start-screen').classList.remove('hidden');
+                this.state = {
+                    currentQuestions: [],
+                    currentIndex: 0,
+                    score: 0,
+                    wrongAnswers: [],
+                    isReviewMode: false,
+                    quizId: null
+                };
             }
         };
 
-        // 啟動應用
-        app.init();
+        // 启动应用
+        window.onload = () => app.init();
     </script>
 </body>
 </html>
