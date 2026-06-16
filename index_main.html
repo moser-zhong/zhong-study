@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育工具网站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .tool-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #4CAF50;
+        }
+
+        .tool-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .tool-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .tool-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tool-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tool-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .welcome-section {
+            background: #e3f2fd;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-left: 5px solid #2196F3;
+        }
+
+        .welcome-section h2 {
+            color: #1976D2;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .welcome-section p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 教育工具网站</h1>
+            <p>提供优质的学习工具，帮助学生提升各项能力</p>
+        </div>
+
+        <div class="content">
+            <div class="welcome-section">
+                <h2>欢迎来到我们的教育平台！</h2>
+                <p>这里汇集了多种学习工具，涵盖语言学习、数学练习等多个领域。每个工具都经过精心设计，旨在提供有趣且有效的学习体验。</p>
+            </div>
+
+            <div class="tools-grid">
+                <div class="tool-card" onclick="window.open('english-quiz/index.html', '_blank')">
+                    <div class="tool-icon">📚</div>
+                    <div class="tool-title">英文单词测验</div>
+                    <div class="tool-description">
+                        小学五年级英文单词测验与复习系统，包含10个分类，共222个单词。
+                        答错的题目会在最后自动复习，完成50题满分可解锁游戏奖励。
+                    </div>
+                    <a href="english-quiz/index.html" class="tool-link">开始测验</a>
+                </div>
+
+                <div class="tool-card" onclick="window.open('english-quiz/time_calculator_simple.html', '_blank')">
+                    <div class="tool-icon">⏰</div>
+                    <div class="tool-title">时间计算练习</div>
+                    <div class="tool-description">
+                        专门练习时间加减法的题库，包含8道精心设计的题目。
+                        涵盖博物馆时间、烤饼干时间、游乐园营业时间等生活场景。
+                    </div>
+                    <a href="english-quiz/time_calculator_simple.html" class="tool-link">开始练习</a>
+                </div>
+
+                <div class="tool-card" onclick="window.open('english-quiz/index1.html', '_blank')">
+                    <div class="tool-icon">🎯</div>
+                    <div class="tool-title">综合测验系统</div>
+                    <div class="tool-description">
+                        更全面的英文学习体验，包含更多题型和难度级别。
+                        适合想要挑战更高难度的学生使用。
+                    </div>
+                    <a href="english-quiz/index1.html" class="tool-link">进入系统</a>
+                </div>
+
+                <div class="tool-card" onclick="window.open('english-quiz/index_github.html', '_blank')">
+                    <div class="tool-icon">🚀</div>
+                    <div class="tool-title">GitHub版本</div>
+                    <div class="tool-description">
+                        GitHub Pages部署的版本，具有更好的性能和稳定性。
+                        支持移动设备访问，随时随地学习。
+                    </div>
+                    <a href="english-quiz/index_github.html" class="tool-link">访问GitHub版</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载动画
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+
+        // 添加点击反馈
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
+</body>
+</html>
