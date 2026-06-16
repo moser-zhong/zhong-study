@@ -670,11 +670,15 @@
 
             unlockRandomGame() {
                 const randomGame = KID_GAMES[Math.floor(Math.random() * KID_GAMES.length)];
+                
+                // 顯示遊戲信息
                 document.getElementById('result-screen').classList.add('hidden');
                 document.getElementById('game-screen').classList.remove('hidden');
-                
                 document.getElementById('game-title').innerHTML = `<i class="fa-solid fa-gamepad mr-2"></i> ${randomGame.name}`;
-                document.getElementById('game-iframe').src = randomGame.url;
+                
+                // 在新窗口中打開遊戲
+                alert(`恭喜！你解鎖了 ${randomGame.name}\n\n遊戲將在新窗口中打開，享受30分鐘的遊戲時間！`);
+                window.open(randomGame.url, '_blank', 'noopener,noreferrer');
                 
                 this.startGameTimer();
             },
@@ -709,7 +713,6 @@
 
             exitGame() {
                 this.stopGameTimer();
-                document.getElementById('game-iframe').src = "";
                 document.getElementById('game-screen').classList.add('hidden');
                 document.getElementById('start-screen').classList.remove('hidden');
             }
