@@ -108,7 +108,7 @@
                 <div class="mb-6">
                     <img src="https://picsum.photos/seed/englishkids/400/200" alt="孩子們快樂學習英文的插圖" class="rounded-2xl shadow-md mx-auto mb-4 w-full max-w-md object-cover h-40 sm:h-48">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-600 mb-2">準備好挑戰了嗎？</h2>
-                    <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習<br/><strong class="text-purple-500">完成50題滿分可解鎖遊戲獎勵哦！🎉</strong></p>
+                    <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習<br/><strong class="text-purple-500">完成100題滿分可解鎖遊戲獎勵哦！🎉</strong></p>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -142,7 +142,7 @@
                     </button>
                     <button onclick="app.startQuiz('mixed')" class="card-hover bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 p-4 sm:p-6 rounded-2xl text-center group col-span-2 sm:col-span-2">
                         <div class="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition">🎲</div>
-                        <h3 class="font-bold text-blue-800 text-base sm:text-lg">綜合大挑戰 (隨機50題)</h3>
+                        <h3 class="font-bold text-blue-800 text-base sm:text-lg">綜合大挑戰 (隨機100題)</h3>
                     </button>
                 </div>
             </div>
@@ -500,9 +500,9 @@
                 let pool = [];
                 if (category === 'mixed') {
                     pool = [...QUESTION_BANK];
-                    // Shuffle and pick 50
+                    // Shuffle and pick 100
                     pool.sort(() => Math.random() - 0.5);
-                    this.currentQuestions = pool.slice(0, 50);
+                    this.currentQuestions = pool.slice(0, 100);
                 } else {
                     pool = QUESTION_BANK.filter(q => q.category === category);
                     // If category has less than 10, take all, else shuffle and take 10
