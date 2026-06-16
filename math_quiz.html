@@ -459,7 +459,7 @@
             const correctAnswers = {
                 'q1': 'D', // 100+24 = 124, 99+24 = 123
                 'q2': 'C', // 8C=1000, C=125
-                'q3': 'A', // B<A<C (B=4, A=0.4, C=125) 這是不對的，應該是 A<B<C
+                'q3': 'B', // A<B<C (A=0.4, B=4, C=125)
                 'q4': 'B'  // 24×(12÷6) = 24×2 = 48
             };
 
@@ -525,17 +525,28 @@
             };
 
             Object.keys(appCorrectAnswers).forEach(appId => {
-                totalQuestions++;
-                const userAnswer = document.getElementById(appId).value.trim();
-                if (userAnswer === appCorrectAnswers[appId]) {
-                    score += 5;
+                if (appId.includes('formula')) {
+                    // 算式題目，2.5分
+                    const userAnswer = document.getElementById(appId).value.trim();
+                    if (userAnswer === appCorrectAnswers[appId]) {
+                        score += 2.5;
+                    } else {
+                        feedback.push(`應用題算式(${appId}): 答案錯誤`);
+                    }
                 } else {
-                    feedback.push(`應用題${appId}: 答案錯誤`);
+                    // 答案題目，2.5分
+                    const userAnswer = document.getElementById(appId).value.trim();
+                    if (userAnswer === appCorrectAnswers[appId]) {
+                        score += 2.5;
+                    } else {
+                        feedback.push(`應用題答案(${appId}): 答案錯誤`);
+                    }
                 }
             });
 
-            // 顯示結果
-            const percentage = (score / (totalQuestions * 2)) * 100; // 假設每題2分基礎
+            // 計算總分和百分比
+            const totalPossibleScore = (4 * 2) + (7 * 2) + (4 * 3) + (4 * 5); // 選擇題8分 + 填空題14分 + 計算題12分 + 應用題20分 = 54分
+            const percentage = (score / totalPossibleScore) * 100;
             let resultText = '';
             
             if (percentage >= 90) {
@@ -548,7 +559,7 @@
                 resultText = '別灰心，多練習幾次就會了！❤️';
             }
 
-            document.getElementById('score-display').textContent = `得分：${score} / ${totalQuestions * 2}`;
+            document.getElementById('score-display').textContent = `得分：${score} / ${totalPossibleScore}分`;
             document.getElementById('feedback').innerHTML = `
                 <p>${resultText}</p>
                 <p>正確率：${percentage.toFixed(1)}%</p>
