@@ -241,10 +241,10 @@
                         下面哪一組數的答案和「99+24」的答案相同？
                     </div>
                     <div class="options-grid">
-                        <div class="option-btn" onclick="selectOption(this, 'q1', 'A')">① 100+24</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q1', 'B')">② 99+10</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q1', 'C')">③ 99+10</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q1', 'D')">④ 99+100</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'A')">① 100+23</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'B')">② 99+25</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'C')">③ 98+25</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'D')">④ 100+24</div>
                     </div>
                 </div>
 
@@ -254,8 +254,8 @@
                         25A=10　25B=100　8C=1000
                     </div>
                     <div class="options-grid">
-                        <div class="option-btn" onclick="selectOption(this, 'q2', 'A')">①A=4</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q2', 'B')">②B=6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'A')">①A=0.4</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'B')">②B=4</div>
                         <div class="option-btn" onclick="selectOption(this, 'q2', 'C')">③C=125</div>
                         <div class="option-btn" onclick="selectOption(this, 'q2', 'D')">④A=8</div>
                     </div>
@@ -264,13 +264,13 @@
                 <div class="question-card">
                     <div class="question-text">
                         下面算式的敘述，哪一個正確？<br>
-                        5²=25　25B=100　8C=1000　B<A<C
+                        5²=25　25B=100　8C=1000
                     </div>
                     <div class="options-grid">
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'A')">①A=4</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'B')">②B=6</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'C')">③C=125</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'D')">④B<A<C</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'A')">①B<A<C</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'B')">②A<B<C</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'C')">③A<C<B</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'D')">④C<A<B</div>
                     </div>
                 </div>
 
@@ -281,8 +281,8 @@
                     <div class="options-grid">
                         <div class="option-btn" onclick="selectOption(this, 'q4', 'A')">①24×12÷6</div>
                         <div class="option-btn" onclick="selectOption(this, 'q4', 'B')">②24×(12÷6)</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q4', 'C')">③24×(12×6)</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q4', 'D')">④12÷6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'C')">③12÷6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'D')">④24×(12×6)</div>
                     </div>
                 </div>
             </div>
@@ -457,9 +457,9 @@
 
             // 計算選擇題分數
             const correctAnswers = {
-                'q1': 'A', // 100+24 = 124, 99+24 = 123, 99+10 = 109, 99+100 = 199
+                'q1': 'D', // 100+24 = 124, 99+24 = 123
                 'q2': 'C', // 8C=1000, C=125
-                'q3': 'D', // B<A+C 是正確的敘述
+                'q3': 'A', // B<A<C (B=4, A=0.4, C=125) 這是不對的，應該是 A<B<C
                 'q4': 'B'  // 24×(12÷6) = 24×2 = 48
             };
 
@@ -476,7 +476,7 @@
             const fillCorrectAnswers = {
                 'fill1': '70',
                 'fill2': '343',
-                'fill3': '420',
+                'fill3': '42',
                 'fill4': '540',
                 'fill5': '5',
                 'fill6': '200',
