@@ -563,6 +563,11 @@
                 // 載入之前的錯誤題目
                 const wrongQuestions = this.loadWrongQuestions();
                 
+                // 調試信息
+                console.log('開始測驗，分類:', category);
+                console.log('錯誤題目數量:', wrongQuestions.length);
+                console.log('錯誤題目:', wrongQuestions);
+                
                 if (category === 'mixed') {
                     pool = [...QUESTION_BANK];
                     
@@ -595,6 +600,7 @@
                     // 如果有錯誤題目且屬於當前分類，優先加入
                     const categoryWrongQuestions = wrongQuestions.filter(q => q.category === category);
                     if (categoryWrongQuestions.length > 0) {
+                        // 將錯誤題目加入題目池
                         pool = [...categoryWrongQuestions, ...pool.filter(q => 
                             !categoryWrongQuestions.some(w => w.word === q.word)
                         )];
@@ -612,6 +618,12 @@
                         // 沒有錯誤題目，正常選取
                         pool.sort(() => Math.random() - 0.5);
                         pool = pool.slice(0, Math.min(pool.length, 10));
+                    }
+                    
+                    // 如果題目池為空（這種情況應該不會發生，但為了安全起見）
+                    if (pool.length === 0) {
+                        alert("該分類暫無題目");
+                        return;
                     }
                 }
 
