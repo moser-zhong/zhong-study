@@ -500,21 +500,35 @@
             
             // 載入錯誤題目
             loadWrongQuestions() {
-                const saved = localStorage.getItem('wrongQuestions');
-                return saved ? JSON.parse(saved) : [];
+                try {
+                    const saved = localStorage.getItem('wrongQuestions');
+                    return saved ? JSON.parse(saved) : [];
+                } catch (e) {
+                    console.error('載入錯誤題目失敗:', e);
+                    return [];
+                }
             },
             
             // 保存錯誤題目
             saveWrongQuestions() {
-                localStorage.setItem('wrongQuestions', JSON.stringify(this.wrongAnswers));
+                try {
+                    localStorage.setItem('wrongQuestions', JSON.stringify(this.wrongAnswers));
+                } catch (e) {
+                    console.error('保存錯誤題目失敗:', e);
+                }
             },
             
             // 清除錯誤題目
             clearWrongQuestions() {
-                localStorage.removeItem('wrongQuestions');
-                this.wrongAnswers = [];
-                this.showWrongQuestionsHint();
-                alert('已清除所有錯誤題目記錄！');
+                try {
+                    localStorage.removeItem('wrongQuestions');
+                    this.wrongAnswers = [];
+                    this.showWrongQuestionsHint();
+                    alert('已清除所有錯誤題目記錄！');
+                } catch (e) {
+                    console.error('清除錯誤題目失敗:', e);
+                    alert('清除錯誤題目失敗，請刷新頁面重試！');
+                }
             },
             
             // 顯示錯誤題目提示
@@ -812,8 +826,23 @@
             }
         };
 
-        // Initialize app
-        window.onload = () => app.init();
+        // Initialize app with error handling
+        window.onload = () => {
+            try {
+                app.init();
+            } catch (e) {
+                console.error('應用程序初始化失敗:', e);
+                alert('應用程序加載失敗，請刷新頁面重試！');
+            }
+        };
+        
+        // Fallback for browsers that don't support localStorage
+        if (typeof localStorage === 'undefined') {
+            console.warn('localStorage 不支持，錯誤題目功能將被禁用');
+            app.loadWrongQuestions = () => [];
+            app.saveWrongQuestions = () => {};
+            app.clearWrongQuestions = () => {};
+        }
     </script>
 </body>
 </html>
