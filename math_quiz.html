@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數學測驗練習</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .quiz-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            background: #f8f9fa;
+            border-left: 5px solid #FF6B6B;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #FF6B6B;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .option-btn:hover {
+            border-color: #FF6B6B;
+            background: #fff5f5;
+        }
+
+        .option-btn.selected {
+            background: #FF6B6B;
+            color: white;
+            border-color: #FF6B6B;
+        }
+
+        .option-btn.correct {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .option-btn.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .fill-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .fill-input:focus {
+            outline: none;
+            border-color: #FF6B6B;
+        }
+
+        .calculation-area {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .result-display {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .feedback {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧮 數學測驗練習</h1>
+            <p>選擇題、填空題、計算題和應用題的綜合練習</p>
+        </div>
+
+        <div class="content">
+            <div class="quiz-section">
+                <div class="section-title">一、選擇題（每題2分，共10分）</div>
+                
+                <div class="question-card">
+                    <div class="question-text">
+                        下面哪一組數的答案和「99+24」的答案相同？
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'A')">① 100+24</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'B')">② 99+10</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'C')">③ 99+10</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q1', 'D')">④ 99+100</div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        下面算式中的 A、B、C 哪一個正確？<br>
+                        25A=10　25B=100　8C=1000
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'A')">①A=4</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'B')">②B=6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'C')">③C=125</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'D')">④A=8</div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        下面算式的敘述，哪一個正確？<br>
+                        5²=25　25B=100　8C=1000　B<A<C
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'A')">①A=4</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'B')">②B=6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'C')">③C=125</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'D')">④B<A<C</div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        一箱橘子有24箱，每箱12個，把12箱橘子水分給6個班级，每班平均分到幾箱橘子水？
+                    </div>
+                    <div class="options-grid">
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'A')">①24×12÷6</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'B')">②24×(12÷6)</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'C')">③24×(12×6)</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q4', 'D')">④12÷6</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-title">二、填空題（每題2分，共50分）</div>
+                
+                <div class="question-card">
+                    <div class="question-text">
+                        5×70×2 = 5×( )×76
+                    </div>
+                    <input type="text" class="fill-input" id="fill1" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        537-( )=194
+                    </div>
+                    <input type="text" class="fill-input" id="fill2" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        360÷(60 )×70
+                    </div>
+                    <input type="text" class="fill-input" id="fill3" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        225×60÷25 = ( )
+                    </div>
+                    <input type="text" class="fill-input" id="fill4" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        4×27×( ) = 540
+                    </div>
+                    <input type="text" class="fill-input" id="fill5" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        578-( )=378
+                    </div>
+                    <input type="text" class="fill-input" id="fill6" placeholder="請填入答案">
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        909+( )=1205
+                    </div>
+                    <input type="text" class="fill-input" id="fill7" placeholder="請填入答案">
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-title">三、計算題（每題3分，共15分）</div>
+                
+                <div class="question-card">
+                    <div class="question-text">
+                        433+199-233 = ?
+                    </div>
+                    <div class="calculation-area">
+                        <p>估算結果：<input type="text" class="fill-input" id="calc1_est" placeholder="估算結果"></p>
+                        <p>精確計算：<input type="text" class="fill-input" id="calc1_exact" placeholder="精確結果"></p>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        628-299-128 = ?
+                    </div>
+                    <div class="calculation-area">
+                        <input type="text" class="fill-input" id="calc2" placeholder="請計算結果">
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        5.77×19+7 = ?
+                    </div>
+                    <div class="calculation-area">
+                        <input type="text" class="fill-input" id="calc3" placeholder="請計算結果">
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        814-(135+165) = ?
+                    </div>
+                    <div class="calculation-area">
+                        <input type="text" class="fill-input" id="calc4" placeholder="請計算結果">
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-section">
+                <div class="section-title">四、應用題（每題5分，共25分）</div>
+                
+                <div class="question-card">
+                    <div class="question-text">
+                        一盒有180張花片，老師買了17盒，平均分給30個小朋友，平均每個小朋友可以分到幾張花片？
+                    </div>
+                    <div class="calculation-area">
+                        <p>算式：<input type="text" class="fill-input" id="app1_formula" placeholder="請寫出算式"></p>
+                        <p>答案：<input type="text" class="fill-input" id="app1_answer" placeholder="請計算結果"></p>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        每盒電池有5個，每箱有16盒，五金行進貨4箱，共進貨幾箱電池？
+                    </div>
+                    <div class="calculation-area">
+                        <p>算式：<input type="text" class="fill-input" id="app2_formula" placeholder="請寫出算式"></p>
+                        <p>答案：<input type="text" class="fill-input" id="app2_answer" placeholder="請計算結果"></p>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        一個後背包比一個皮夾貴150元，一個皮夾199元，買了兩個後背包後，總共花了多少元？
+                    </div>
+                    <div class="calculation-area">
+                        <p>算式：<input type="text" class="fill-input" id="app3_formula" placeholder="請寫出算式"></p>
+                        <p>答案：<input type="text" class="fill-input" id="app3_answer" placeholder="請計算結果"></p>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-text">
+                        紅繩的長度比黃繩長17公分，黃繩長50公分，紅繩長幾公分？
+                    </div>
+                    <div class="calculation-area">
+                        <p>算式：<input type="text" class="fill-input" id="app4_formula" placeholder="請寫出算式"></p>
+                        <p>答案：<input type="text" class="fill-input" id="app4_answer" placeholder="請計算結果"></p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" onclick="submitQuiz()">提交答案</button>
+            
+            <div id="result-display" class="result-display" style="display: none;">
+                <div class="score-display" id="score-display"></div>
+                <div class="feedback" id="feedback"></div>
+                <button class="reset-btn" onclick="resetQuiz()">重新測驗</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let answers = {};
+        let selectedOptions = {};
+
+        function selectOption(element, questionId, option) {
+            // 清除同問題的其他選項
+            const questionCard = element.closest('.question-card');
+            const allOptions = questionCard.querySelectorAll('.option-btn');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // 選中當前選項
+            element.classList.add('selected');
+            selectedOptions[questionId] = option;
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            let totalQuestions = 0;
+            let feedback = [];
+
+            // 計算選擇題分數
+            const correctAnswers = {
+                'q1': 'A', // 100+24 = 124, 99+24 = 123, 99+10 = 109, 99+100 = 199
+                'q2': 'C', // 8C=1000, C=125
+                'q3': 'D', // B<A+C 是正確的敘述
+                'q4': 'B'  // 24×(12÷6) = 24×2 = 48
+            };
+
+            Object.keys(correctAnswers).forEach(questionId => {
+                totalQuestions++;
+                if (selectedOptions[questionId] === correctAnswers[questionId]) {
+                    score += 2;
+                } else {
+                    feedback.push(`選擇題${questionId}: 答案錯誤`);
+                }
+            });
+
+            // 計算填空題分數
+            const fillCorrectAnswers = {
+                'fill1': '70',
+                'fill2': '343',
+                'fill3': '420',
+                'fill4': '540',
+                'fill5': '5',
+                'fill6': '200',
+                'fill7': '296'
+            };
+
+            Object.keys(fillCorrectAnswers).forEach(fillId => {
+                totalQuestions++;
+                const userAnswer = document.getElementById(fillId).value.trim();
+                if (userAnswer === fillCorrectAnswers[fillId]) {
+                    score += 2;
+                } else {
+                    feedback.push(`填空題${fillId}: 答案錯誤`);
+                }
+            });
+
+            // 計算計算題分數
+            const calcCorrectAnswers = {
+                'calc1_est': '400',
+                'calc1_exact': '399',
+                'calc2': '201',
+                'calc3': '116.63',
+                'calc4': '514'
+            };
+
+            Object.keys(calcCorrectAnswers).forEach(calcId => {
+                totalQuestions++;
+                const userAnswer = document.getElementById(calcId).value.trim();
+                if (userAnswer === calcCorrectAnswers[calcId]) {
+                    score += 3;
+                } else {
+                    feedback.push(`計算題${calcId}: 答案錯誤`);
+                }
+            });
+
+            // 計算應用題分數
+            const appCorrectAnswers = {
+                'app1_formula': '180×17÷30',
+                'app1_answer': '102',
+                'app2_formula': '5×16×4',
+                'app2_answer': '320',
+                'app3_formula': '(199+150)×2',
+                'app3_answer': '698',
+                'app4_formula': '50+17',
+                'app4_answer': '67'
+            };
+
+            Object.keys(appCorrectAnswers).forEach(appId => {
+                totalQuestions++;
+                const userAnswer = document.getElementById(appId).value.trim();
+                if (userAnswer === appCorrectAnswers[appId]) {
+                    score += 5;
+                } else {
+                    feedback.push(`應用題${appId}: 答案錯誤`);
+                }
+            });
+
+            // 顯示結果
+            const percentage = (score / (totalQuestions * 2)) * 100; // 假設每題2分基礎
+            let resultText = '';
+            
+            if (percentage >= 90) {
+                resultText = '優秀！你是數學小天才！🌟';
+            } else if (percentage >= 80) {
+                resultText = '非常優秀！繼續保持！💪';
+            } else if (percentage >= 60) {
+                resultText = '不錯哦，再加油一點！📚';
+            } else {
+                resultText = '別灰心，多練習幾次就會了！❤️';
+            }
+
+            document.getElementById('score-display').textContent = `得分：${score} / ${totalQuestions * 2}`;
+            document.getElementById('feedback').innerHTML = `
+                <p>${resultText}</p>
+                <p>正確率：${percentage.toFixed(1)}%</p>
+                ${feedback.length > 0 ? `<p><strong>需要改進的題目：</strong></p><ul>${feedback.map(f => `<li>${f}</li>`).join('')}</ul>` : ''}
+            `;
+            document.getElementById('result-display').style.display = 'block';
+        }
+
+        function resetQuiz() {
+            // 清除所有選擇
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.fill-input').forEach(input => input.value = '');
+            
+            // 清除答案
+            answers = {};
+            selectedOptions = {};
+            
+            // 隱藏結果
+            document.getElementById('result-display').style.display = 'none';
+        }
+
+        // 添加頁面加載動畫
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.question-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
