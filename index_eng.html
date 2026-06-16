@@ -109,6 +109,17 @@
                     <img src="https://picsum.photos/seed/englishkids/400/200" alt="孩子們快樂學習英文的插圖" class="rounded-2xl shadow-md mx-auto mb-4 w-full max-w-md object-cover h-40 sm:h-48">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-blue-600 mb-2">準備好挑戰了嗎？</h2>
                     <p class="text-gray-500 text-sm sm:text-base">選擇一個主題開始測驗，答錯的題目會在最後複習<br/><strong class="text-purple-500">完成100題滿分可解鎖遊戲獎勵哦！🎉</strong></p>
+                    
+                    <!-- 錯誤題目提示 -->
+                    <div id="wrong-questions-hint" class="hidden mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-red-700 text-sm">
+                            <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+                            您有 <span id="wrong-count">0</span> 個答錯的題目，這些題目將在下次測驗中優先出現！
+                        </p>
+                        <button onclick="app.clearWrongQuestions()" class="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm transition">
+                            <i class="fa-solid fa-eraser mr-1"></i> 清除錯誤記錄
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -483,6 +494,41 @@
 
             init() {
                 this.resetApp();
+                // 顯示錯誤題目提示
+                this.showWrongQuestionsHint();
+            },
+            
+            // 載入錯誤題目
+            loadWrongQuestions() {
+                const saved = localStorage.getItem('wrongQuestions');
+                return saved ? JSON.parse(saved) : [];
+            },
+            
+            // 保存錯誤題目
+            saveWrongQuestions() {
+                localStorage.setItem('wrongQuestions', JSON.stringify(this.wrongAnswers));
+            },
+            
+            // 清除錯誤題目
+            clearWrongQuestions() {
+                localStorage.removeItem('wrongQuestions');
+                this.wrongAnswers = [];
+                this.showWrongQuestionsHint();
+                alert('已清除所有錯誤題目記錄！');
+            },
+            
+            // 顯示錯誤題目提示
+            showWrongQuestionsHint() {
+                const wrongQuestions = this.loadWrongQuestions();
+                const hint = document.getElementById('wrong-questions-hint');
+                const count = document.getElementById('wrong-count');
+                
+                if (wrongQuestions.length > 0) {
+                    hint.classList.remove('hidden');
+                    count.textContent = wrongQuestions.length;
+                } else {
+                    hint.classList.add('hidden');
+                }
             },
 
             resetApp() {
@@ -493,21 +539,66 @@
                 document.getElementById('game-screen').classList.add('hidden');
                 document.getElementById('review-section').classList.add('hidden');
                 document.getElementById('perfect-reward').classList.add('hidden');
-                this.wrongAnswers = [];
+                // 不清除錯誤題目，讓它們在下次測驗中出現
+                // this.wrongAnswers = [];
             },
 
             startQuiz(category) {
                 let pool = [];
+                
+                // 載入之前的錯誤題目
+                const wrongQuestions = this.loadWrongQuestions();
+                
                 if (category === 'mixed') {
                     pool = [...QUESTION_BANK];
-                    // Shuffle and pick 100
-                    pool.sort(() => Math.random() - 0.5);
-                    this.currentQuestions = pool.slice(0, 100);
+                    
+                    // 如果有錯誤題目，優先加入題目池
+                    if (wrongQuestions.length > 0) {
+                        // 將錯誤題目加入題目池的前面
+                        pool = [...wrongQuestions, ...pool.filter(q => 
+                            !wrongQuestions.some(w => w.word === q.word)
+                        )];
+                        
+                        // 計算還需要多少題
+                        const remainingQuestions = 100 - wrongQuestions.length;
+                        
+                        // 如果還需要更多題目，隨機選取
+                        if (remainingQuestions > 0) {
+                            const remainingPool = pool.filter(q => 
+                                !wrongQuestions.some(w => w.word === q.word)
+                            );
+                            remainingPool.sort(() => Math.random() - 0.5);
+                            pool = [...wrongQuestions, ...remainingPool.slice(0, remainingQuestions)];
+                        }
+                    } else {
+                        // 沒有錯誤題目，正常隨機選取100題
+                        pool.sort(() => Math.random() - 0.5);
+                        pool = pool.slice(0, 100);
+                    }
                 } else {
                     pool = QUESTION_BANK.filter(q => q.category === category);
-                    // If category has less than 10, take all, else shuffle and take 10
-                    pool.sort(() => Math.random() - 0.5);
-                    this.currentQuestions = pool.slice(0, Math.min(pool.length, 10));
+                    
+                    // 如果有錯誤題目且屬於當前分類，優先加入
+                    const categoryWrongQuestions = wrongQuestions.filter(q => q.category === category);
+                    if (categoryWrongQuestions.length > 0) {
+                        pool = [...categoryWrongQuestions, ...pool.filter(q => 
+                            !categoryWrongQuestions.some(w => w.word === q.word)
+                        )];
+                        
+                        // 如果還需要更多題目，隨機選取
+                        const remainingQuestions = Math.min(pool.length, 10) - categoryWrongQuestions.length;
+                        if (remainingQuestions > 0) {
+                            const remainingPool = pool.filter(q => 
+                                !categoryWrongQuestions.some(w => w.word === q.word)
+                            );
+                            remainingPool.sort(() => Math.random() - 0.5);
+                            pool = [...categoryWrongQuestions, ...remainingPool.slice(0, remainingQuestions)];
+                        }
+                    } else {
+                        // 沒有錯誤題目，正常選取
+                        pool.sort(() => Math.random() - 0.5);
+                        pool = pool.slice(0, Math.min(pool.length, 10));
+                    }
                 }
 
                 if (this.currentQuestions.length === 0) {
@@ -612,6 +703,9 @@
                 const total = this.currentQuestions.length;
                 document.getElementById('final-score').textContent = this.score;
                 document.getElementById('final-total').textContent = total;
+                
+                // 保存錯誤題目供下次測驗使用
+                this.saveWrongQuestions();
                 
                 const percentage = (this.score / total) * 100;
                 const comment = document.getElementById('score-comment');
