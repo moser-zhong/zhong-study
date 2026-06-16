@@ -257,7 +257,7 @@
                         <div class="option-btn" onclick="selectOption(this, 'q2', 'A')">①A=0.4</div>
                         <div class="option-btn" onclick="selectOption(this, 'q2', 'B')">②B=4</div>
                         <div class="option-btn" onclick="selectOption(this, 'q2', 'C')">③C=125</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q2', 'D')">④A=8</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q2', 'D')">④以上都是正確的</div>
                     </div>
                 </div>
 
@@ -267,10 +267,10 @@
                         5²=25　25B=100　8C=1000
                     </div>
                     <div class="options-grid">
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'A')">①B<A<C</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'A')">①B<C<A</div>
                         <div class="option-btn" onclick="selectOption(this, 'q3', 'B')">②A<B<C</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'C')">③A<C<B</div>
-                        <div class="option-btn" onclick="selectOption(this, 'q3', 'D')">④C<A<B</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'C')">③B<A<C</div>
+                        <div class="option-btn" onclick="selectOption(this, 'q3', 'D')">④C<B<A</div>
                     </div>
                 </div>
 
@@ -458,8 +458,8 @@
             // 計算選擇題分數
             const correctAnswers = {
                 'q1': 'D', // 100+24 = 124, 99+24 = 123
-                'q2': 'C', // 8C=1000, C=125
-                'q3': 'B', // A<B<C (A=0.4, B=4, C=125)
+                'q2': 'D', // 以上都是正確的 (A=0.4, B=4, C=125)
+                'q3': 'C', // B<A<C (如果A=5, 則 B=4, A=5, C=125)
                 'q4': 'B'  // 24×(12÷6) = 24×2 = 48
             };
 
