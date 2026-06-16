@@ -615,10 +615,12 @@
                     }
                 }
 
-                if (this.currentQuestions.length === 0) {
+                if (pool.length === 0) {
                     alert("該分類暫無題目");
                     return;
                 }
+                
+                this.currentQuestions = pool;
 
                 this.currentIndex = 0;
                 this.score = 0;
