@@ -250,15 +250,7 @@
         </div>
 
         <div class="content">
-            <div class="tips">
-                <h3>💡 解题技巧</h3>
-                <ul>
-                    <li>记住：1小时 = 60分钟，1分钟 = 60秒</li>
-                    <li>减法时如果分钟不够，需要向小时借位</li>
-                    <li>下午时间记得转换为24小时制（如：5:00 PM = 17:00）</li>
-                    <li>计算时注意单位的一致性</li>
-                </ul>
-            </div>
+
 
             <div id="questionsContainer">
                 <!-- 题目将通过JavaScript动态生成 -->
@@ -289,64 +281,56 @@
                 title: "博物馆参观时间",
                 content: "Lily和弟弟参观艺术博物馆，9:35 AM进入，11:30 AM离开。他们在博物馆待了多长时间？",
                 unit: "小时分钟",
-                answer: { hours: 1, minutes: 55 },
-                hint: "记住：11:30 - 9:35 = ? 需要借位吗？"
+                answer: { hours: 1, minutes: 55 }
             },
             {
                 id: 2,
                 title: "烤饼干时间",
                 content: "Qiqi从2:05:40 PM开始烤饼干，2:50:10 PM完成。烤饼干花了多长时间？",
                 unit: "分钟秒",
-                answer: { minutes: 44, seconds: 30 },
-                hint: "注意：2:50:10 PM = 14:50:10，计算时秒位需要借位吗？"
+                answer: { minutes: 44, seconds: 30 }
             },
             {
                 id: 3,
                 title: "游乐园营业时间",
                 content: "游乐园9:30 AM开门，5:00 PM关门。游乐园营业多长时间？",
                 unit: "小时分钟",
-                answer: { hours: 7, minutes: 30 },
-                hint: "记住：5:00 PM = 17:00，然后计算17:00 - 9:30"
+                answer: { hours: 7, minutes: 30 }
             },
             {
                 id: 4,
                 title: "阅读和钢琴练习",
                 content: "小芳花了2小时36分钟阅读，弹钢琴花了1小时25分钟。她看书和弹钢琴共花了多长时间？",
                 unit: "小时分钟",
-                answer: { hours: 4, minutes: 1 },
-                hint: "2小时36分钟 + 1小时25分钟 = ? 记得将61分钟转换为1小时1分钟"
+                answer: { hours: 4, minutes: 1 }
             },
             {
                 id: 5,
                 title: "冬至昼夜时间",
                 content: "冬至这一天有24小时，夜晚13小时20分钟。白天的时长是多少？",
                 unit: "小时分钟",
-                answer: { hours: 10, minutes: 40 },
-                hint: "24小时 = 23小时60分钟，然后减去13小时20分钟"
+                answer: { hours: 10, minutes: 40 }
             },
             {
                 id: 6,
                 title: "接力赛时间比较",
                 content: "甲班接力赛用了29分18秒，乙班用了27分31秒。乙班比甲班快多少时间？",
                 unit: "分钟秒",
-                answer: { minutes: 1, seconds: 47 },
-                hint: "注意：29分18秒 - 27分31秒，秒位需要借位"
+                answer: { minutes: 1, seconds: 47 }
             },
             {
                 id: 7,
                 title: "维多利亚号邮轮",
                 content: "维多利亚号在3月5日上午10时出航，3月8日上午9时靠岸。乘客在邮轮上度过了多长时间？",
                 unit: "小时",
-                answer: { hours: 71 },
-                hint: "从3月5日10时到3月8日10时是3天，然后减去1小时"
+                answer: { hours: 71 }
             },
             {
                 id: 8,
                 title: "苏花公路维修",
                 content: "苏花公路在2月20日下午5时开始维修，2月21日上午11时恢复通车。公路封路了多长时间？",
                 unit: "小时",
-                answer: { hours: 18 },
-                hint: "从2月20日17时到2月21日11时，总共是18小时"
+                answer: { hours: 18 }
             }
         ];
 
@@ -371,7 +355,6 @@
                         </div>
                         <div class="buttons">
                             <button class="btn btn-primary" onclick="checkAnswer(${index})">检查答案</button>
-                            <button class="btn btn-secondary" onclick="showHint(${index})">提示</button>
                         </div>
                         <div class="feedback" id="feedback-${index}"></div>
                     </div>
@@ -463,13 +446,7 @@
             updateProgress();
         }
 
-        // 显示提示
-        function showHint(questionIndex) {
-            const question = questions[questionIndex];
-            const feedback = document.getElementById(`feedback-${questionIndex}`);
-            feedback.className = 'feedback correct';
-            feedback.innerHTML = `💡 提示：${question.hint}`;
-        }
+
 
         // 格式化答案
         function formatAnswer(answer, unit) {
